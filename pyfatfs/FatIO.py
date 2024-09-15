@@ -6,10 +6,17 @@ import io
 import threading
 from typing import Union, Optional
 
-from fs.mode import Mode
 from pyfatfs import PyFATException
 
 from pyfatfs.PyFat import PyFat
+
+
+class DefaultModeReadOnly:
+    def __init__(self):
+        self.truncate = False
+        self.appending = False
+        self.reading = True
+        self.writing = False
 
 
 class FatIO(io.RawIOBase):
@@ -17,7 +24,7 @@ class FatIO(io.RawIOBase):
 
     def __init__(self, fs: PyFat,
                  path: str,
-                 mode: Mode = Mode('r')) -> None:
+                 mode = DefaultModeReadOnly()) -> None:
         """Wrap basic I/O operations for PyFat. **Currently read-only**.
 
         :param fs: `PyFat`: Instance of opened filesystem
