@@ -483,14 +483,14 @@ class FSTestCases(object):
 
     def test_isfile(self):
         self.assertFalse(self.fs.isfile("foo.txt"))
-        self.fs.create("foo.txt")
+        self.fs._create("foo.txt")
         self.assertTrue(self.fs.isfile("foo.txt"))
         self.fs.makedir("bar")
         self.assertFalse(self.fs.isfile("bar"))
 
     def test_isdir(self):
         self.assertFalse(self.fs.isdir("foo"))
-        self.fs.create("bar")
+        self.fs._create("bar")
         self.fs.makedir("foo")
         self.assertTrue(self.fs.isdir("foo"))
         self.assertFalse(self.fs.isdir("bar"))
@@ -663,7 +663,7 @@ class FSTestCases(object):
         for name in self.fs.listdir("dir"):
             self.assertIsInstance(name, text_type)
 
-        self.fs.create("notadir")
+        self.fs._create("notadir")
         with self.assertRaises(NotADirectoryError):
             self.fs.listdir("notadir")
 
@@ -1168,12 +1168,12 @@ class FSTestCases(object):
         self.fs.makedirs("foo/bar/baz")
         self.fs.makedirs("foo/egg")
         self.fs.makedirs("foo/a/b/c/d/e")
-        self.fs.create("foo/egg.txt")
-        self.fs.create("foo/bar/egg.bin")
-        self.fs.create("foo/bar/baz/egg.txt")
-        self.fs.create("foo/a/b/c/1.txt")
-        self.fs.create("foo/a/b/c/2.txt")
-        self.fs.create("foo/a/b/c/3.txt")
+        self.fs._create("foo/egg.txt")
+        self.fs._create("foo/bar/egg.bin")
+        self.fs._create("foo/bar/baz/egg.txt")
+        self.fs._create("foo/a/b/c/1.txt")
+        self.fs._create("foo/a/b/c/2.txt")
+        self.fs._create("foo/a/b/c/3.txt")
 
         self.assert_exists("foo/egg.txt")
         self.assert_exists("foo/bar/egg.bin")
@@ -1183,7 +1183,7 @@ class FSTestCases(object):
         self.assert_exists("spam")
 
         # Errors on files
-        self.fs.create("bar")
+        self.fs._create("bar")
         with self.assertRaises(NotADirectoryError):
             self.fs.removetree("bar")
 
@@ -1195,11 +1195,11 @@ class FSTestCases(object):
         self.fs.makedirs("foo/bar/baz")
         self.fs.makedirs("foo/egg")
         self.fs.makedirs("foo/a/b/c/d/e")
-        self.fs.create("foo/egg.txt")
-        self.fs.create("foo/bar/egg.bin")
-        self.fs.create("foo/a/b/c/1.txt")
-        self.fs.create("foo/a/b/c/2.txt")
-        self.fs.create("foo/a/b/c/3.txt")
+        self.fs._create("foo/egg.txt")
+        self.fs._create("foo/bar/egg.bin")
+        self.fs._create("foo/a/b/c/1.txt")
+        self.fs._create("foo/a/b/c/2.txt")
+        self.fs._create("foo/a/b/c/3.txt")
 
         self.assert_exists("foo/egg.txt")
         self.assert_exists("foo/bar/egg.bin")
@@ -1214,13 +1214,13 @@ class FSTestCases(object):
         # to catch potential issues with the
         # root folder being deleted on faulty
         # implementations
-        self.fs.create("egg")
+        self.fs._create("egg")
         self.fs.makedir("yolk")
         self.assert_exists("egg")
         self.assert_exists("yolk")
 
     def test_setinfo(self):
-        self.fs.create("birthday.txt")
+        self.fs._create("birthday.txt")
         now = time.time()
 
         change_info = {"details": {"accessed": now + 60, "modified": now + 60 * 60}}
@@ -1241,7 +1241,7 @@ class FSTestCases(object):
             self.fs.setinfo("nothing", {})
 
     def test_settimes(self):
-        self.fs.create("birthday.txt")
+        self.fs._create("birthday.txt")
         self.fs.settimes("birthday.txt", accessed=datetime(2016, 7, 5))
         info = self.fs.getinfo("birthday.txt", namespaces=["details"])
         can_write_acccess = info.is_writeable("details", "accessed")
@@ -1343,7 +1343,7 @@ class FSTestCases(object):
     def test_create(self):
         # Test create new file
         self.assertFalse(self.fs.exists("foo"))
-        self.fs.create("foo")
+        self.fs._create("foo")
         self.assertTrue(self.fs.exists("foo"))
         self.assertEqual(self.fs._gettype("foo"), "file")
         self.assertEqual(self.fs._getsize("foo"), 0)
@@ -1351,18 +1351,18 @@ class FSTestCases(object):
         # Test wipe existing file
         self.fs.write_bytes("foo", b"bar")
         self.assertEqual(self.fs._getsize("foo"), 3)
-        self.fs.create("foo", wipe=True)
+        self.fs._create("foo", wipe=True)
         self.assertEqual(self.fs._getsize("foo"), 0)
 
         # Test create with existing file, and not wipe
         self.fs.write_bytes("foo", b"bar")
         self.assertEqual(self.fs._getsize("foo"), 3)
-        self.fs.create("foo", wipe=False)
+        self.fs._create("foo", wipe=False)
         self.assertEqual(self.fs._getsize("foo"), 3)
 
     def test_desc(self):
         # Describe a file
-        self.fs.create("foo")
+        self.fs._create("foo")
         description = self.fs.desc("foo")
         self.assertIsInstance(description, text_type)
 
@@ -1389,13 +1389,13 @@ class FSTestCases(object):
         self.assertEqual(list(iter_scandir), [])
 
         # Check scanning
-        self.fs.create("foo")
+        self.fs._create("foo")
 
         # Can't scandir on a file
         with self.assertRaises(NotADirectoryError):
             list(self.fs.scandir("foo"))
 
-        self.fs.create("bar")
+        self.fs._create("bar")
         self.fs.makedir("dir")
         iter_scandir = self.fs.scandir("/")
         self.assertTrue(isinstance(iter_scandir, collections_abc.Iterable))
@@ -1438,9 +1438,9 @@ class FSTestCases(object):
         self.assertEqual(list(self.fs.filterdir("/", files=["*.py"])), [])
 
         self.fs.makedir("bar")
-        self.fs.create("foo.txt")
-        self.fs.create("foo.py")
-        self.fs.create("foo.pyc")
+        self.fs._create("foo.txt")
+        self.fs._create("foo.py")
+        self.fs._create("foo.pyc")
 
         page1 = list(self.fs.filterdir("/", page=(None, 2)))
         page2 = list(self.fs.filterdir("/", page=(2, 4)))
@@ -1531,7 +1531,7 @@ class FSTestCases(object):
         self.fs.makedir("foo")
         self.assertFalse(self.fs.isempty("/"))
         self.assertTrue(self.fs.isempty("/foo"))
-        self.fs.create("foo/bar.txt")
+        self.fs._create("foo/bar.txt")
         self.assertFalse(self.fs.isempty("/foo"))
         self.fs.remove("foo/bar.txt")
         self.assertTrue(self.fs.isempty("/foo"))
@@ -1903,7 +1903,7 @@ class FSTestCases(object):
 
     def test_tree(self):
         self.fs.makedirs("foo/bar")
-        self.fs.create("test.txt")
+        self.fs._create("test.txt")
         write_tree = io.StringIO()
         self.fs.tree(file=write_tree)
         written = write_tree.getvalue()
