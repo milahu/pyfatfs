@@ -12,7 +12,7 @@ from fsspec import AbstractFileSystem
 from pyfatfs.mode import Mode
 from pyfatfs.path import split, normpath
 from pyfatfs.permissions import Permissions
-from fsspec.info import Info
+from pyfatfs.info import Info
 from fsspec.errors import DirectoryExpected, DirectoryExists, \
     ResourceNotFound, FileExpected, DirectoryNotEmpty, RemoveRootError, \
     FileExists
