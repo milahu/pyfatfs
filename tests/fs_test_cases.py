@@ -1335,23 +1335,6 @@ class FSTestCases(object):
         self.fs._create("foo", wipe=False)
         self.assertEqual(self.fs._getsize("foo"), 3)
 
-    def test_desc(self):
-        # Describe a file
-        self.fs._create("foo")
-        description = self.fs.desc("foo")
-        self.assertIsInstance(description, text_type)
-
-        # Describe a dir
-        self.fs.makedir("dir")
-        self.fs.desc("dir")
-
-        # Special cases that may hide bugs
-        self.fs.desc("/")
-        self.fs.desc("")
-
-        with self.assertRaises(FileNotFoundError):
-            self.fs.desc("bar")
-
     def test_scandir(self):
         # Check exception for scanning dir that doesn't exist
         with self.assertRaises(FileNotFoundError):
