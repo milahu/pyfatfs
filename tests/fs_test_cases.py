@@ -1717,6 +1717,7 @@ class FSTestCases(object):
         # Test copying to this filesystem from another.
 
         other_fs = fsspec.filesystem(protocol)
+        self.assertEqual(other_fs.ls("/", detail=False), []) # other_fs should be empty
         other_fs.makedirs("foo/bar/baz")
         other_fs.makedir("egg")
         other_fs.write_text("top.txt", "Hello, World")
