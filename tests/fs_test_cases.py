@@ -399,6 +399,7 @@ class FSTestCases(object):
 
         """
         assert isinstance(contents, text_type)
+        assert self.fs.exists(path)
         with self.fs.open(path, "rt") as f:
             data = f.read()
         self.assertEqual(data, contents)
