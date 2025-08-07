@@ -355,12 +355,13 @@ class PyFatFS(AbstractFileSystem):
         path = normpath(path)
         parts = path.split("/")
         for num_parts in range(1, len(parts) + 1):
+            _path = "/".join(parts[:num_parts])
+            if _path == "": continue
             try:
-                self.mkdir("/".join(parts[:num_parts]))
+                self.mkdir(_path)
             except FileExistsError:
                 if not exist_ok:
                     raise
-                break
 
     def removedir(self, path: str):
         """Remove empty directories from the filesystem.
