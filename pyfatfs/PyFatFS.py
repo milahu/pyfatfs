@@ -456,7 +456,7 @@ class PyFatFS(AbstractFileSystem):
         except ResourceNotFound:
             raise ResourceNotFound(path)
         else:
-            if info.is_dir:
+            if info["type"][0] == "d":
                 raise FileExpected(path)
 
         return FatIO(self.fs, path, mode)
