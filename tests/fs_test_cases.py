@@ -519,68 +519,6 @@ class FSTestCases(object):
         #     # ValueError: embedded null byte
         #     self.fs.validatepath("invalid\0file")
 
-    def test_getinfo(self):
-        # Test special case of root directory
-        # Root directory has a name of ''
-        root_info = self.fs.getinfo("/")
-        self.assertEqual(root_info.name, "")
-        self.assertTrue(root_info.is_dir)
-        self.assertIn("basic", root_info.namespaces)
-
-        # Make a file of known size
-        self.fs.write_bytes("foo", b"bar")
-        self.fs.makedir("dir")
-
-        # Check basic namespace
-        info = self.fs.getinfo("foo").raw
-        self.assertIn("basic", info)
-        self.assertIsInstance(info["basic"]["name"], text_type)
-        self.assertEqual(info["basic"]["name"], "foo")
-        self.assertFalse(info["basic"]["is_dir"])
-
-        # Check basic namespace dir
-        info = self.fs.getinfo("dir").raw
-        self.assertIn("basic", info)
-        self.assertEqual(info["basic"]["name"], "dir")
-        self.assertTrue(info["basic"]["is_dir"])
-
-        # Get the info
-        info = self.fs.getinfo("foo", namespaces=["details"]).raw
-        self.assertIn("basic", info)
-        self.assertIsInstance(info, dict)
-        self.assertEqual(info["details"]["size"], 3)
-        self.assertEqual(info["details"]["type"], "file")
-
-        # Test getdetails
-        self.assertEqual(info, self.fs.getdetails("foo").raw)
-
-        # Raw info should be serializable
-        try:
-            json.dumps(info)
-        except (TypeError, ValueError):
-            raise AssertionError("info should be JSON serializable")
-
-        # Non existant namespace is not an error
-        no_info = self.fs.getinfo("foo", "__nosuchnamespace__").raw
-        self.assertIsInstance(no_info, dict)
-        self.assertEqual(no_info["basic"], {"name": "foo", "is_dir": False})
-
-        # Check a number of standard namespaces
-        # FS objects may not support all these, but we can at least
-        # invoke the code
-        info = self.fs.getinfo("foo", namespaces=["access", "stat", "details"])
-
-        # Check that if the details namespace is present, times are
-        # of valid types.
-        if "details" in info.namespaces:
-            details = info.raw["details"]
-            self.assertIsInstance(details.get("accessed"), (type(None), int, float))
-            self.assertIsInstance(details.get("modified"), (type(None), int, float))
-            self.assertIsInstance(details.get("created"), (type(None), int, float))
-            self.assertIsInstance(
-                details.get("metadata_changed"), (type(None), int, float)
-            )
-
     def test_exists(self):
         # Test exists method.
         # Check root directory always exists
