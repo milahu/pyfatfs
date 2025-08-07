@@ -778,7 +778,7 @@ class FSTestCases(object):
 
         # Test text files are proper iterators over themselves
         lines = os.linesep.join(["Line 1", "Line 2", "Line 3"])
-        self.fs.writetext("iter.txt", lines)
+        self.fs.write_text("iter.txt", lines)
         with self.fs.open("iter.txt") as f:
             for actual, expected in zip(f, lines.splitlines(1)):
                 self.assertEqual(actual, expected)
@@ -1505,14 +1505,14 @@ class FSTestCases(object):
         self.assert_text("foo/unicode.txt", UNICODE_TEXT)
 
     def test_writetext(self):
-        # Test writetext method.
-        self.fs.writetext("foo", "bar")
+        # Test write_text method.
+        self.fs.write_text("foo", "bar")
         with self.fs.open("foo", "rt") as f:
             foo = f.read()
         self.assertEqual(foo, "bar")
         self.assertIsInstance(foo, text_type)
         with self.assertRaises(TypeError):
-            self.fs.writetext("nottext", b"bytes")
+            self.fs.write_text("nottext", b"bytes")
 
     def test_writefile(self):
         bytes_file = io.BytesIO(b"bar")
@@ -1652,8 +1652,8 @@ class FSTestCases(object):
 
         self.fs.makedirs("foo/bar/baz")
         self.fs.makedir("egg")
-        self.fs.writetext("top.txt", "Hello, World")
-        self.fs.writetext("/foo/bar/baz/test.txt", "Goodbye, World")
+        self.fs.write_text("top.txt", "Hello, World")
+        self.fs.write_text("/foo/bar/baz/test.txt", "Goodbye, World")
 
         self.fs.copy("/foo", "/foo2")
         expected = {"/bar", "/bar/baz", "/bar/baz/test.txt"}
@@ -1689,8 +1689,8 @@ class FSTestCases(object):
         other_fs = fsspec.open(protocol)
         other_fs.makedirs("foo/bar/baz")
         other_fs.makedir("egg")
-        other_fs.writetext("top.txt", "Hello, World")
-        other_fs.writetext("/foo/bar/baz/test.txt", "Goodbye, World")
+        other_fs.write_text("top.txt", "Hello, World")
+        other_fs.write_text("/foo/bar/baz/test.txt", "Goodbye, World")
         copy_dir(other_fs, "/", self.fs, "/")
         expected = {"/egg", "/foo", "/foo/bar", "/foo/bar/baz"}
         self.assertEqual(set(walk.walk_dirs(self.fs)), expected)
@@ -1710,8 +1710,8 @@ class FSTestCases(object):
     def test_move_dir_same_fs(self):
         self.fs.makedirs("foo/bar/baz")
         self.fs.makedir("egg")
-        self.fs.writetext("top.txt", "Hello, World")
-        self.fs.writetext("/foo/bar/baz/test.txt", "Goodbye, World")
+        self.fs.write_text("top.txt", "Hello, World")
+        self.fs.write_text("/foo/bar/baz/test.txt", "Goodbye, World")
 
         fs.move.move_dir(self.fs, "foo", self.fs, "foo2")
 
@@ -1730,8 +1730,8 @@ class FSTestCases(object):
         other_fs = fsspec.open(protocol)
         other_fs.makedirs("foo/bar/baz")
         other_fs.makedir("egg")
-        other_fs.writetext("top.txt", "Hello, World")
-        other_fs.writetext("/foo/bar/baz/test.txt", "Goodbye, World")
+        other_fs.write_text("top.txt", "Hello, World")
+        other_fs.write_text("/foo/bar/baz/test.txt", "Goodbye, World")
 
         fs.move.move_dir(other_fs, "/", self.fs, "/")
 
@@ -1749,7 +1749,7 @@ class FSTestCases(object):
 
     def test_move_file_same_fs(self):
         text = "Hello, World"
-        self.fs.makedir("foo").writetext("test.txt", text)
+        self.fs.makedir("foo").write_text("test.txt", text)
         self.assert_text("foo/test.txt", text)
 
         fs.move.move_file(self.fs, "foo/test.txt", self.fs, "foo/test2.txt")
@@ -1763,7 +1763,7 @@ class FSTestCases(object):
         other_fs = fsspec.open(protocol)
 
         text = "Hello, World"
-        self.fs.makedir("foo").writetext("test.txt", text)
+        self.fs.makedir("foo").write_text("test.txt", text)
         self.assert_text("foo/test.txt", text)
 
         with self.assertRaises(FileNotFoundError):
@@ -1782,7 +1782,7 @@ class FSTestCases(object):
         self._test_move_file("temp://")
 
     # def test_move_file_onto_itself(self):
-    #     self.fs.writetext("file.txt", "Hello")
+    #     self.fs.write_text("file.txt", "Hello")
     #     self.fs.move("file.txt", "file.txt", overwrite=True)
     #     self.assert_text("file.txt", "Hello")
 
@@ -1791,7 +1791,7 @@ class FSTestCases(object):
 
     # def test_move_file_onto_itself_relpath(self):
     #     subdir = self.fs.makedir("sub")
-    #     subdir.writetext("file.txt", "Hello")
+    #     subdir.write_text("file.txt", "Hello")
     #     self.fs.move("sub/file.txt", "sub/../sub/file.txt", overwrite=True)
     #     self.assert_text("sub/file.txt", "Hello")
 
@@ -1799,7 +1799,7 @@ class FSTestCases(object):
     #         self.fs.move("sub/file.txt", "sub/../sub/file.txt", overwrite=False)
 
     # def test_copy_file_onto_itself(self):
-    #     self.fs.writetext("file.txt", "Hello")
+    #     self.fs.write_text("file.txt", "Hello")
     #     with self.assertRaises(errors.IllegalDestination):
     #         self.fs.copy("file.txt", "file.txt", overwrite=True)
     #     with self.assertRaises(errors.DestinationExists):
@@ -1808,7 +1808,7 @@ class FSTestCases(object):
 
     # def test_copy_file_onto_itself_relpath(self):
     #     subdir = self.fs.makedir("sub")
-    #     subdir.writetext("file.txt", "Hello")
+    #     subdir.write_text("file.txt", "Hello")
     #     with self.assertRaises(errors.IllegalDestination):
     #         self.fs.copy("sub/file.txt", "sub/../sub/file.txt", overwrite=True)
     #     with self.assertRaises(errors.DestinationExists):
@@ -1829,7 +1829,7 @@ class FSTestCases(object):
             raise unittest.SkipTest("the filesystem does not support unicode paths.")
 
         self.fs.makedir("földér")
-        self.fs.writetext("☭.txt", "Smells like communism.")
+        self.fs.write_text("☭.txt", "Smells like communism.")
         self.fs.write_bytes("földér/☣.txt", b"Smells like an old syringe.")
 
         self.assert_isdir("földér")
