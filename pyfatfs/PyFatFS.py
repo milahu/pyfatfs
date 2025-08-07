@@ -11,7 +11,7 @@ from typing import Union
 from fsspec import AbstractFileSystem
 from pyfatfs.mode import Mode
 from pyfatfs.path import split, normpath
-from fsspec.permissions import Permissions
+from pyfatfs.permissions import Permissions
 from fsspec.info import Info
 from fsspec.errors import DirectoryExpected, DirectoryExists, \
     ResourceNotFound, FileExpected, DirectoryNotEmpty, RemoveRootError, \
