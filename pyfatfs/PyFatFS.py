@@ -9,7 +9,7 @@ from io import BytesIO, IOBase
 from typing import Union
 
 from fsspec import AbstractFileSystem
-from fsspec.mode import Mode
+from pyfatfs.mode import Mode
 from fsspec.path import split, normpath
 from fsspec.permissions import Permissions
 from fsspec.info import Info
