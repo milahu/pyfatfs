@@ -76,7 +76,7 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
             t.join()
         f.close()
 
-        read_text = self.fs.readtext("/WRITE.TXT")
+        read_text = self.fs.read_text("/WRITE.TXT")
         for i in range(0, 10):
             self.assertIn(str(i) * 10 + "\n", read_text)
 
@@ -97,7 +97,7 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
         for t in threads:
             t.join()
 
-        read_text = self.fs.readtext("/APPEND.TXT")
+        read_text = self.fs.read_text("/APPEND.TXT")
         for i in range(0, 10):
             self.assertIn(str(i) * 10 + "\n", read_text)
 
@@ -279,10 +279,10 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
         fname = "/truncatetest.txt"
         self.fs.touch(fname)
         self.fs.writetext(fname, '0' * 64)
-        assert self.fs.readtext(fname) == '0' * 64
+        assert self.fs.read_text(fname) == '0' * 64
         self.fs.writetext(fname, '1' * 16)
-        assert len(self.fs.readtext(fname)) == 16
-        assert self.fs.readtext(fname) == '1' * 16
+        assert len(self.fs.read_text(fname)) == 16
+        assert self.fs.read_text(fname) == '1' * 16
 
 
 class TestPyFatFS32(TestPyFatFS16, FSTestCases, TestCase, PyFsCompatLayer):
