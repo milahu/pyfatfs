@@ -1656,11 +1656,14 @@ class FSTestCases(object):
         self.fs.write_text("top.txt", "Hello, World")
         self.fs.write_text("/foo/bar/baz/test.txt", "Goodbye, World")
 
-        self.fs.copy("/foo", "/foo2")
+        self.fs.copy("/foo", "/foo2", recursive=True)
+
         expected = {"/bar", "/bar/baz", "/bar/baz/test.txt"}
-        for path, dirs, files in self.fs.walk("/foo2"):
-            pass
-            # TODO compare with expected
+        actual = self.fs.find("/foo2", withdirs=True)
+        actual = map(lambda p: p[5:], actual) # remove "/foo2" prefix
+        actual = set(actual)
+        self.assertEqual(actual, expected)
+
         self.assert_text("top.txt", "Hello, World")
         self.assert_text("/foo/bar/baz/test.txt", "Goodbye, World")
         self.assert_text("/foo2/bar/baz/test.txt", "Goodbye, World")
