@@ -98,12 +98,12 @@ def move_dir(fs1, path1, fs2, path2):
 def walk_files(fs, path="/"):
     for subpath, dirs, files in fs.walk(path):
         for file in files:
-            yield normpath(subpath + "/" + file)
+            yield normpath(path + "/" + subpath + "/" + file)
 
 def walk_dirs(fs, path="/"):
     for subpath, dirs, files in fs.walk(path):
         for _dir in dirs:
-            yield normpath(subpath + "/" + _dir)
+            yield normpath(path + "/" + subpath + "/" + _dir)
 
 class TempdirFileSystem(fsspec.implementations.dirfs.DirFileSystem):
     def __init__(self, **kwargs):
