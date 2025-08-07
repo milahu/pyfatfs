@@ -353,15 +353,18 @@ class PyFatFS(AbstractFileSystem):
         """
         path = normpath(path)
         parts = path.split("/")
+        last_part_exists = False
         for num_parts in range(1, len(parts) + 1):
             _path = "/".join(parts[:num_parts])
             if _path == "": continue
             try:
                 self.mkdir(_path)
+                last_part_exists = False
             except (FileExistsError, PyFATException):
                 # PyFATException: Directory entry is already 8.3 conform
-                if not exist_ok:
-                    raise FileExistsError(_path)
+                last_part_exists = True
+        if not exist_ok and last_part_exists:
+            raise FileExistsError(path)
 
     def removedir(self, path: str):
         """Remove empty directories from the filesystem.

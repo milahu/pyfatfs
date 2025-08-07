@@ -650,8 +650,8 @@ class FSTestCases(object):
         with self.assertRaises(FileExistsError):
             self.fs.makedir("/")
 
-        # Making root is a null op with recreate
-        self.fs.makedir("/", recreate=True)
+        # Making root is a null op with exist_ok
+        self.fs.makedirs("/", exist_ok=True)
         self.assertEqual(self.fs.listdir("/"), [])
 
         self.assert_not_exists("foo")
@@ -690,7 +690,7 @@ class FSTestCases(object):
         with self.assertRaises(FileExistsError):
             self.fs.makedirs("foo/bar/baz")
 
-        self.fs.makedirs("foo/bar/baz", recreate=True)
+        self.fs.makedirs("foo/bar/baz", exist_ok=True)
 
         self.fs.write_bytes("foo.bin", b"test")
         with self.assertRaises(NotADirectoryError):
