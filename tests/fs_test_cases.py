@@ -609,7 +609,7 @@ class FSTestCases(object):
         self.assert_not_exists("egg")
 
         # Delete a file
-        self.fs.remove("foo/bar/baz")
+        self.fs.rm("foo/bar/baz")
         # Check it no longer exists
         self.assert_not_exists("foo/bar/baz")
         self.assertFalse(self.fs.exists("foo/bar/baz"))
@@ -1115,25 +1115,25 @@ class FSTestCases(object):
         self.assert_isfile("foo2")
         self.assert_isfile("foo3")
 
-        self.fs.remove("foo2")
+        self.fs.rm("foo2")
 
         self.assert_isfile("foo1")
         self.assert_not_exists("foo2")
         self.assert_isfile("foo3")
 
         with self.assertRaises(FileNotFoundError):
-            self.fs.remove("bar")
+            self.fs.rm("bar")
 
         self.fs.makedir("dir")
         with self.assertRaises(IsADirectoryError):
-            self.fs.remove("dir")
+            self.fs.rm("dir")
 
         self.fs.makedirs("foo/bar/baz/")
 
         error_msg = "resource 'foo/bar/egg/test.txt' not found"
         assertRaisesRegex = getattr(self, "assertRaisesRegex", self.assertRaisesRegexp)
         with assertRaisesRegex(FileNotFoundError, error_msg):
-            self.fs.remove("foo/bar/egg/test.txt")
+            self.fs.rm("foo/bar/egg/test.txt")
 
     def test_removedir(self):
 
@@ -1498,7 +1498,7 @@ class FSTestCases(object):
         self.assertTrue(self.fs.isempty("/foo"))
         self.fs._create("foo/bar.txt")
         self.assertFalse(self.fs.isempty("/foo"))
-        self.fs.remove("foo/bar.txt")
+        self.fs.rm("foo/bar.txt")
         self.assertTrue(self.fs.isempty("/foo"))
 
     def test_write_bytes(self):
@@ -1892,7 +1892,7 @@ class FSTestCases(object):
         if self.fs.hassyspath("földér/☣.txt"):
             self.assertTrue(os.path.exists(self.fs.getsyspath("földér/☣.txt")))
 
-        self.fs.remove("földér/☣.txt")
+        self.fs.rm("földér/☣.txt")
         self.assert_not_exists("földér/☣.txt")
         self.fs.removedir("földér")
         self.assert_not_exists("földér")
