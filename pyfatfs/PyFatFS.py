@@ -187,10 +187,11 @@ class PyFatFS(AbstractFileSystem):
         dirname = path.split("/")[-1]
 
         # Plausibility checks
-        try:
-            self.opendir(basename)
-        except DirectoryExpected:
-            raise ResourceNotFound(path)
+        # FIXME AttributeError: 'PyFatBytesIOFS' object has no attribute 'opendir'
+        # try:
+        #     self.opendir(basename)
+        # except DirectoryExpected:
+        #     raise ResourceNotFound(path)
         base = self._get_dir_entry(basename)
 
         try:
