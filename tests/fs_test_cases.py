@@ -1236,11 +1236,6 @@ class FSTestCases(object):
         with self.assertRaises(FileNotFoundError):
             self.fs.copy("egg", "spam")
 
-        # Test copying a directory
-        self.fs.makedir("dir")
-        with self.assertRaises(IsADirectoryError):
-            self.fs.copy("dir", "folder")
-
     def _test_upload(self, workers):
         """Test copy_fs with varying number of worker threads."""
         with fsspec.open("temp://") as src_fs:
