@@ -1766,6 +1766,8 @@ class FSTestCases(object):
         other_fs.makedir("egg")
         other_fs.write_text("top.txt", "Hello, World")
         other_fs.write_text("/foo/bar/baz/test.txt", "Goodbye, World")
+        # fix: FileExistsError: /foo
+        self.fs.rm("/", recursive=True)
         copy_dir(other_fs, "/", self.fs, "/")
         expected = {"/egg", "/foo", "/foo/bar", "/foo/bar/baz"}
         self.assertEqual(set(walk_dirs(self.fs)), expected)
