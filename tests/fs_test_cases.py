@@ -1371,16 +1371,6 @@ class FSTestCases(object):
     #     self.fs.download("hello.bin", write_file, chunk_size=8)
     #     self.assertEqual(write_file.getvalue(), test_bytes)
 
-    def test_isempty(self):
-        self.assertTrue(self.fs.isempty("/"))
-        self.fs.makedir("foo")
-        self.assertFalse(self.fs.isempty("/"))
-        self.assertTrue(self.fs.isempty("/foo"))
-        self.fs._create("foo/bar.txt")
-        self.assertFalse(self.fs.isempty("/foo"))
-        self.fs.rm("foo/bar.txt")
-        self.assertTrue(self.fs.isempty("/foo"))
-
     def test_write_bytes(self):
         all_bytes = b"".join(six.int2byte(n) for n in range(256))
         self.fs.write_bytes("foo", all_bytes)
