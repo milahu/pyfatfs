@@ -88,13 +88,14 @@ class PyFatFS(AbstractFileSystem):
 
         return True
 
-    def getinfo(self, path: str, namespaces=None):
-        """Generate PyFilesystem2's `Info` struct.
-
-        :param path: Path to file or directory on filesystem
-        :param namespaces: Info namespaces to query, `NotImplemented`
-        :returns: `Info`
-        """
+    def info(self, path, **kwargs):
+        _type = self._gettype(path)
+        if _type[0] == "d":
+            # dont call self._getsize
+            return {"name": path, "size": 0, "type": _type}
+        return {"name": path, "size": self._getsize(path), "type": _type}
+        # TODO maybe use some of this code
+        # TODO remove dead code
         try:
             entry = self.fs.root_dir.get_entry(path)
         except PyFATException as e:
@@ -109,7 +110,7 @@ class PyFatFS(AbstractFileSystem):
                             "metadata_changed": None,
                             "modified": entry.get_mtime().timestamp(),
                             "size": entry.filesize,
-                            "type": self.gettype(path)}}
+                            "type": self._gettype(path)}}
         return Info(info)
 
     def getmeta(self, namespace=u'standard'):
@@ -143,13 +144,6 @@ class PyFatFS(AbstractFileSystem):
                 raise ResourceNotFound(path)
             raise e
         return entry.filesize
-
-    def info(self, path, **kwargs):
-        _type = self._gettype(path)
-        if _type[0] == "d":
-            # dont call self._getsize
-            return {"name": path, "size": 0, "type": _type}
-        return {"name": path, "size": self._getsize(path), "type": _type}
 
     def _gettype(self, path: str) -> str:
         """Get type of file as `str`.
@@ -448,7 +442,7 @@ class PyFatFS(AbstractFileSystem):
         if mode.create:
             if mode.exclusive:
                 try:
-                    self.getinfo(path)
+                    self.info(path)
                 except ResourceNotFound:
                     pass
                 else:
@@ -458,7 +452,7 @@ class PyFatFS(AbstractFileSystem):
             raise ValueError('Text-mode not allowed in openbin')
 
         try:
-            info = self.getinfo(path)
+            info = self.info(path)
         except ResourceNotFound:
             raise ResourceNotFound(path)
         else:
