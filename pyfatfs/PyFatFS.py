@@ -5,7 +5,7 @@ import datetime
 import posixpath
 import errno
 from copy import copy
-from io import BytesIO, IOBase
+from io import BytesIO, IOBase, TextIOWrapper
 from typing import Union
 
 from fsspec import AbstractFileSystem
@@ -428,6 +428,7 @@ class PyFatFS(AbstractFileSystem):
             self.fs.free_cluster_chain(dir_entry.get_cluster())
         del dir_entry
 
+    # def openbin(self, path: str, mode: str = "r",
     def open(self, path: str, mode: str = "r",
                 buffering: int = -1, **options):
         """Open file from filesystem.
@@ -438,7 +439,9 @@ class PyFatFS(AbstractFileSystem):
         :returns: `BinaryIO` stream
         """
         # path = self.validatepath(path)
-        mode = Mode(mode + 'b')
+        # FIXME handle text mode
+        # mode = Mode(mode + 'b')
+        mode = Mode(mode)
         if mode.create:
             if mode.exclusive:
                 try:
@@ -448,8 +451,8 @@ class PyFatFS(AbstractFileSystem):
                 else:
                     raise FileExists(path)
             self._create(path)
-        if "t" in mode:
-            raise ValueError('Text-mode not allowed in openbin')
+        # if "t" in mode:
+        #     raise ValueError('Text-mode not allowed in openbin')
 
         try:
             info = self.info(path)
@@ -459,7 +462,11 @@ class PyFatFS(AbstractFileSystem):
             if info["type"][0] == "d":
                 raise FileExpected(path)
 
-        return FatIO(self.fs, path, mode)
+        # return FatIO(self.fs, path, mode)
+        _io = FatIO(self.fs, path, mode)
+        if not "b" in mode:
+            return TextIOWrapper(_io)
+        return _io
 
     def _get_dir_entry(self, path: str) -> FATDirectoryEntry:
         """Get a filesystem object for a path.
