@@ -31,6 +31,8 @@ def _make_fs(fat_type: int, **kwargs) -> (PyFatBytesIOFS, BytesIO):
                     size=part_sz)
             pf.flush_fat()
 
+    # fix: UserWarning: Filesystem was not cleanly unmounted on last access.
+    pf._mark_clean()
     in_memory_fs.seek(0)
     in_memory_fs = BytesIO(in_memory_fs.read())
     return (PyFatBytesIOFS(in_memory_fs,
@@ -121,8 +123,10 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
 
         for t in threads:
             t.join()
+
+        # fix: UserWarning: Filesystem was not cleanly unmounted on last access.
+        fs.fs._mark_clean()
         in_memory_fs.seek(0)
-        # FIXME UserWarning: Filesystem was not cleanly unmounted on last access.
         fs = PyFatBytesIOFS(BytesIO(in_memory_fs.read()),
                             encoding='UTF-8', lazy_load=True)
         expected_dentries_root = []
@@ -151,6 +155,8 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
         assert foo_dentry.get_full_path() == "foo"
         assert foobar_dentry.get_full_path() == "foo/bar"
 
+        # fix: UserWarning: Filesystem was not cleanly unmounted on last access.
+        fs.fs._mark_clean()
         in_memory_fs.seek(0)
         fs = PyFatBytesIOFS(BytesIO(in_memory_fs.read()),
                             encoding='UTF-8', lazy_load=True)
@@ -174,6 +180,8 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
         fs.touch("/foo/bar")
         assert fs.listdir("/foo", detail=False) == ['bar']
 
+        # fix: UserWarning: Filesystem was not cleanly unmounted on last access.
+        fs.fs._mark_clean()
         in_memory_fs.seek(0)
         fs = PyFatBytesIOFS(BytesIO(in_memory_fs.read()),
                             encoding='UTF-8', lazy_load=True)
@@ -196,13 +204,17 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
             fs1.touch(os.path.join(d, "FILE2.TXT"))
 
         dentries_fs1_initial = list(fs1.walk("/"))
-        fs1.fs.flush_fat()
+        # fs1.fs.flush_fat() # called in fs1.fs._mark_clean
+        # fix: UserWarning: Filesystem was not cleanly unmounted on last access.
+        fs1.fs._mark_clean()
         in_memory_fs.seek(0)
         in_memory_fs = BytesIO(in_memory_fs.read())
         fs1 = PyFatBytesIOFS(in_memory_fs, encoding='UTF-8', lazy_load=False)
         dentries_fs1_reopen = list(fs1.walk("/"))
         assert dentries_fs1_initial == dentries_fs1_reopen
 
+        # fix: UserWarning: Filesystem was not cleanly unmounted on last access.
+        fs1.fs._mark_clean()
         in_memory_fs.seek(0)
         fs2 = PyFatBytesIOFS(BytesIO(in_memory_fs.read()),
                              encoding='UTF-8', lazy_load=True)
