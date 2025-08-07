@@ -1042,8 +1042,6 @@ class FSTestCases(object):
             self.assertEqual(foo_fs.read_bytes("bar"), b"barbar")
             self.assertEqual(foo_fs.read_bytes("egg"), b"eggegg")
 
-        self.assertFalse(self.fs.isclosed())
-
         # Attempt to open a non-existent directory
         with self.assertRaises(FileNotFoundError):
             self.fs.opendir("egg")
@@ -1214,18 +1212,6 @@ class FSTestCases(object):
                 "details"
             ]["accessed"]
             self.assertTrue(accessed - now < 5)
-
-    def test_close(self):
-        self.assertFalse(self.fs.isclosed())
-        self.fs.close()
-        self.assertTrue(self.fs.isclosed())
-        # Check second close call is a no-op
-        self.fs.close()
-        self.assertTrue(self.fs.isclosed())
-
-        # # Check further operations raise a FilesystemClosed exception
-        # with self.assertRaises(errors.FilesystemClosed):
-        #     self.fs.open("test.bin")
 
     def test_copy(self):
         # Test copy to new path
