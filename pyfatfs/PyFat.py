@@ -845,13 +845,6 @@ class PyFat(object):
         self.__fp.close()
         self.initialized = False
 
-    def __del__(self):
-        """Try to close open handles."""
-        try:
-            self.close()
-        except PyFATException:
-            pass
-
     def __determine_fat_type(self) -> Union["PyFat.FAT_TYPE_FAT12",
                                             "PyFat.FAT_TYPE_FAT16",
                                             "PyFat.FAT_TYPE_FAT32"]:
