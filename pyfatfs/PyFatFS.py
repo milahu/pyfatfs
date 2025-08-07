@@ -64,15 +64,13 @@ class PyFatFS(AbstractFileSystem):
             self.tz = datetime.datetime.now(datetime.timezone.utc)
             self.tz = self.tz.astimezone().tzinfo
 
-    def close(self):
+    def __del__(self):
         """Clean up open handles."""
         try:
             self.fs.close()
         except OSError:
             # Ignore if filesystem is already closed
             pass
-
-        super(PyFatFS, self).close()
 
     def exists(self, path: str):
         """Verify if given path exists on filesystem.

@@ -74,7 +74,6 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
 
         for t in threads:
             t.join()
-        f.close()
 
         read_text = self.fs.read_text("/WRITE.TXT")
         for i in range(0, 10):
@@ -208,8 +207,6 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
         fs2 = PyFatBytesIOFS(BytesIO(in_memory_fs.read()),
                              encoding='UTF-8', lazy_load=True)
         assert dentries_fs1_reopen == list(fs2.walk("/"))
-        fs1.close()
-        fs2.close()
 
     def test_write_file_e2big(self):
         """Verify that files that are too big cannot be written."""
