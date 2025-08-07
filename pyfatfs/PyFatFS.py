@@ -7,6 +7,7 @@ import errno
 from copy import copy
 from io import BytesIO, IOBase, TextIOWrapper
 from typing import Union
+from shutil import copyfileobj
 
 from fsspec import AbstractFileSystem
 from pyfatfs.mode import Mode
@@ -467,6 +468,16 @@ class PyFatFS(AbstractFileSystem):
         if not "b" in mode:
             return TextIOWrapper(_io)
         return _io
+
+    def cp_file(self, path1, path2, **kwargs):
+        # FIXME handle path2 exists
+        # https://github.com/fsspec/filesystem_spec/issues/909#issuecomment-1204212507
+        # copy from one filesystem to the other
+        with (
+            self.open(path1, "rb") as f1,
+            self.open(path2, "wb") as f2
+        ):
+            copyfileobj(f1, f2)
 
     def _get_dir_entry(self, path: str) -> FATDirectoryEntry:
         """Get a filesystem object for a path.
