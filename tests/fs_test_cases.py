@@ -408,7 +408,7 @@ class FSTestCases(object):
         with self.assertRaises(IsADirectoryError):
             self.fs.open("/")
         with self.assertRaises(IsADirectoryError):
-            self.fs.openbin("/")
+            self.fs.open("/")
 
     def test_basic(self):
         #  Check str and repr don't break
@@ -786,14 +786,14 @@ class FSTestCases(object):
     def test_openbin_rw(self):
         # Open a file that doesn't exist
         with self.assertRaises(FileNotFoundError):
-            self.fs.openbin("doesnotexist", "r")
+            self.fs.open("doesnotexist", "r")
 
         self.fs.makedir("foo")
 
         # Create a new text file
         text = b"Hello, World\n"
 
-        with self.fs.openbin("foo/hello", "w") as f:
+        with self.fs.open("foo/hello", "w") as f:
             repr(f)
             self.assertIn("b", f.mode)
             self.assertIsInstance(f, io.IOBase)
@@ -804,11 +804,11 @@ class FSTestCases(object):
         self.assertTrue(f.closed)
 
         with self.assertRaises(FileExistsError):
-            with self.fs.openbin("foo/hello", "x") as f:
+            with self.fs.open("foo/hello", "x") as f:
                 pass
 
         # Read it back
-        with self.fs.openbin("foo/hello", "r") as f:
+        with self.fs.open("foo/hello", "r") as f:
             self.assertIn("b", f.mode)
             self.assertIsInstance(f, io.IOBase)
             self.assertTrue(f.readable())
@@ -821,20 +821,20 @@ class FSTestCases(object):
 
         # Test overwrite
         text = b"Goodbye, World"
-        with self.fs.openbin("foo/hello", "w") as f:
+        with self.fs.open("foo/hello", "w") as f:
             self.assertEqual(len(text), f.write(text))
         self.assert_bytes("foo/hello", text)
 
         # Test FileExpected raised
         with self.assertRaises(IsADirectoryError):
-            self.fs.openbin("foo")  # directory
+            self.fs.open("foo")  # directory
 
         # Open from missing dir
         with self.assertRaises(FileNotFoundError):
-            self.fs.openbin("/foo/bar/test.txt")
+            self.fs.open("/foo/bar/test.txt")
 
         # Test fileno returns a file number, if supported by the file.
-        with self.fs.openbin("foo/hello") as f:
+        with self.fs.open("foo/hello") as f:
             try:
                 fn = f.fileno()
             except io.UnsupportedOperation:
@@ -845,7 +845,7 @@ class FSTestCases(object):
         # Test binary files are proper iterators over themselves
         lines = b"\n".join([b"Line 1", b"Line 2", b"Line 3"])
         self.fs.writebytes("iter.bin", lines)
-        with self.fs.openbin("iter.bin") as f:
+        with self.fs.open("iter.bin") as f:
             for actual, expected in zip(f, lines.splitlines(1)):
                 self.assertEqual(actual, expected)
 
@@ -954,7 +954,7 @@ class FSTestCases(object):
 
     def test_openbin(self):
         # Write a binary file
-        with self.fs.openbin("file.bin", "wb") as write_file:
+        with self.fs.open("file.bin", "wb") as write_file:
             repr(write_file)
             text_type(write_file)
             self.assertIn("b", write_file.mode)
@@ -966,7 +966,7 @@ class FSTestCases(object):
         self.assertTrue(write_file.closed)
 
         # Read a binary file
-        with self.fs.openbin("file.bin", "rb") as read_file:
+        with self.fs.open("file.bin", "rb") as read_file:
             repr(write_file)
             text_type(write_file)
             self.assertIn("b", read_file.mode)
@@ -980,37 +980,37 @@ class FSTestCases(object):
 
         # Check disallow text mode
         with self.assertRaises(ValueError):
-            with self.fs.openbin("file.bin", "rt") as read_file:
+            with self.fs.open("file.bin", "rt") as read_file:
                 pass
 
         # Check errors
         with self.assertRaises(FileNotFoundError):
-            self.fs.openbin("foo.bin")
+            self.fs.open("foo.bin")
 
         # Open from missing dir
         with self.assertRaises(FileNotFoundError):
-            self.fs.openbin("/foo/bar/test.txt")
+            self.fs.open("/foo/bar/test.txt")
 
         self.fs.makedir("foo")
         # Attempt to open a directory
         with self.assertRaises(IsADirectoryError):
-            self.fs.openbin("/foo")
+            self.fs.open("/foo")
 
         # Attempt to write to a directory
         with self.assertRaises(IsADirectoryError):
-            self.fs.openbin("/foo", "w")
+            self.fs.open("/foo", "w")
 
         # Opening a file in a directory which doesn't exist
         with self.assertRaises(FileNotFoundError):
-            self.fs.openbin("/egg/bar")
+            self.fs.open("/egg/bar")
 
         # Opening a file in a directory which doesn't exist
         with self.assertRaises(FileNotFoundError):
-            self.fs.openbin("/egg/bar", "w")
+            self.fs.open("/egg/bar", "w")
 
         # Opening with a invalid mode
         with self.assertRaises(ValueError):
-            self.fs.openbin("foo.bin", "h")
+            self.fs.open("foo.bin", "h")
 
     def test_open_exclusive(self):
         with self.fs.open("test_open_exclusive", "x") as f:
@@ -1020,11 +1020,11 @@ class FSTestCases(object):
             self.fs.open("test_open_exclusive", "x")
 
     def test_openbin_exclusive(self):
-        with self.fs.openbin("test_openbin_exclusive", "x") as f:
+        with self.fs.open("test_openbin_exclusive", "x") as f:
             f.write(b"bananas")
 
         with self.assertRaises(FileExistsError):
-            self.fs.openbin("test_openbin_exclusive", "x")
+            self.fs.open("test_openbin_exclusive", "x")
 
     def test_opendir(self):
         # Make a simple directory structure
@@ -1225,7 +1225,7 @@ class FSTestCases(object):
 
         # # Check further operations raise a FilesystemClosed exception
         # with self.assertRaises(errors.FilesystemClosed):
-        #     self.fs.openbin("test.bin")
+        #     self.fs.open("test.bin")
 
     def test_copy(self):
         # Test copy to new path
@@ -1561,7 +1561,7 @@ class FSTestCases(object):
 
     def test_bin_files(self):
         # Check binary files.
-        with self.fs.openbin("foo1", "wb") as f:
+        with self.fs.open("foo1", "wb") as f:
             text_type(f)
             repr(f)
             f.write(b"a")
@@ -1570,30 +1570,30 @@ class FSTestCases(object):
         self.assert_bytes("foo1", b"abc")
 
         # Test writelines
-        with self.fs.openbin("foo2", "wb") as f:
+        with self.fs.open("foo2", "wb") as f:
             f.writelines([b"hello\n", b"world"])
         self.assert_bytes("foo2", b"hello\nworld")
 
         # Test readline
-        with self.fs.openbin("foo2") as f:
-            self.assertEqual(f.readline(), b"hello\n")
-            self.assertEqual(f.readline(), b"world")
+        with self.fs.open("foo2") as f:
+            self.assertEqual(f.readline(), "hello\n")
+            self.assertEqual(f.readline(), "world")
 
         # Test readlines
-        with self.fs.openbin("foo2") as f:
+        with self.fs.open("foo2") as f:
             lines = f.readlines()
-        self.assertEqual(lines, [b"hello\n", b"world"])
-        with self.fs.openbin("foo2") as f:
+        self.assertEqual(lines, ["hello\n", "world"])
+        with self.fs.open("foo2") as f:
             lines = list(f)
-        self.assertEqual(lines, [b"hello\n", b"world"])
-        with self.fs.openbin("foo2") as f:
+        self.assertEqual(lines, ["hello\n", "world"])
+        with self.fs.open("foo2") as f:
             lines = []
             for line in f:
                 lines.append(line)
-        self.assertEqual(lines, [b"hello\n", b"world"])
-        with self.fs.openbin("foo2") as f:
+        self.assertEqual(lines, ["hello\n", "world"])
+        with self.fs.open("foo2") as f:
             print(repr(f))
-            self.assertEqual(next(f), b"hello\n")
+            self.assertEqual(next(f), "hello\n")
 
         # Test truncate
         with self.fs.open("foo2", "r+b") as f:
