@@ -19,6 +19,8 @@ import warnings
 from datetime import datetime
 from six import text_type
 
+from pyfatfs.path import split, normpath
+
 import fsspec
 
 if six.PY2:
@@ -90,10 +92,7 @@ def move_dir(fs1, path1, fs2, path2):
 def walk_files(fs, path="/"):
     for subpath, dirs, files in fs.walk(path):
         for file in files:
-            yield subpath + "/" + file
-        # FIXME recursion?
-        # for _dir in dirs:
-        #     yield from walk_files(fs, path=(subpath + "/" + _dir))
+            yield normpath(subpath + "/" + file)
 
 UNICODE_TEXT = """
 
