@@ -359,9 +359,10 @@ class PyFatFS(AbstractFileSystem):
             if _path == "": continue
             try:
                 self.mkdir(_path)
-            except FileExistsError:
+            except (FileExistsError, PyFATException):
+                # PyFATException: Directory entry is already 8.3 conform
                 if not exist_ok:
-                    raise
+                    raise FileExistsError(_path)
 
     def removedir(self, path: str):
         """Remove empty directories from the filesystem.
