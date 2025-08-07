@@ -8,16 +8,16 @@ from copy import copy
 from io import BytesIO, IOBase
 from typing import Union
 
-from fs.base import FS
-from fs.mode import Mode
-from fs.path import split, normpath
-from fs.permissions import Permissions
-from fs.info import Info
-from fs.errors import DirectoryExpected, DirectoryExists, \
+from fsspec.base import FS
+from fsspec.mode import Mode
+from fsspec.path import split, normpath
+from fsspec.permissions import Permissions
+from fsspec.info import Info
+from fsspec.errors import DirectoryExpected, DirectoryExists, \
     ResourceNotFound, FileExpected, DirectoryNotEmpty, RemoveRootError, \
     FileExists
-from fs import ResourceType
-from fs.subfs import SubFS
+from fsspec import ResourceType
+from fsspec.subfs import SubFS
 
 from pyfatfs import FAT_OEM_ENCODING
 from pyfatfs.DosDateTime import DosDateTime

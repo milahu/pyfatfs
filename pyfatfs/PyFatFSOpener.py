@@ -4,11 +4,11 @@
 import warnings
 from typing import get_type_hints
 
-from fs.opener.parse import ParseResult
+from fsspec.opener.parse import ParseResult
 
 __all__ = ['PyFatFSOpener']
 
-from fs.opener import Opener
+from fsspec.opener import Opener
 
 from pyfatfs.PyFatFS import PyFatFS
 

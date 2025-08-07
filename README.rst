@@ -56,7 +56,7 @@ Use fs.open_fs to open a filesystem with a FAT `FS URL <https://pyfilesystem2.re
 
 .. code-block:: python
 
-   import fs
+   import fsspec as fs
    my_fs = fs.open_fs("fat:///dev/sda1")
 
 
@@ -85,7 +85,7 @@ long file names of the VFAT extension, as LFN are always stored as UTF-16-LE.
 
 .. code-block:: python
 
-   import fs
+   import fsspec as fs
    my_fs = fs.open_fs("fat:///dev/sda1?encoding=cp1252")
 
 
@@ -97,7 +97,7 @@ complete disk images can be read if the location of the partition is known:
 
 .. code-block:: python
 
-   import fs
+   import fsspec as fs
    my_fs = fs.open_fs("fat:///dev/sda?offset=32256")
 
 
@@ -110,7 +110,7 @@ but can be disabled by setting preserve_case to ``false``:
 
 .. code-block:: python
 
-   import fs
+   import fsspec as fs
    my_fs = fs.open_fs("fat:///dev/sda1?preserve_case=false")
 
 
@@ -122,7 +122,7 @@ This defaults to false but can be enabled by setting read_only to ``true``:
 
 .. code-block:: python
 
-   import fs
+   import fsspec as fs
    my_fs = fs.open_fs("fat:///dev/sda1?read_only=true")
 
 
@@ -134,7 +134,7 @@ Affects all directory entries' creation, modification and access times.
 
 .. code-block:: python
 
-    import fs
+    import fsspec as fs
     my_fs = fs.open_fs("fat:///dev/sda1?utc=true")
 
 
@@ -147,7 +147,7 @@ recursion / directory loops.
 
 .. code-block:: python
 
-    import fs
+    import fsspec as fs
     my_fs = fs.open_fs("fat:///dev/sda1?lazy_load=false")
 .. pyfilesystem-quickstart-end
 

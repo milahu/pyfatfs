@@ -2,7 +2,7 @@
 
 """Make sure the fat PyFilesystem2 protocol gets registered properly."""
 
-import fs
+import fsspec as fs
 import pytest
 
 
