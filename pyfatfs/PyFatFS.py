@@ -14,14 +14,13 @@ from pyfatfs.path import split, normpath
 from pyfatfs.permissions import Permissions
 from pyfatfs.info import Info
 from pyfatfs.errors import DirectoryExpected, \
-    ResourceNotFound, FileExpected, DirectoryNotEmpty, RemoveRootError, \
+    FileExpected, DirectoryNotEmpty, RemoveRootError, \
     FileExists
 
 from pyfatfs import FAT_OEM_ENCODING
 from pyfatfs.DosDateTime import DosDateTime
 from pyfatfs.PyFat import PyFat
 from pyfatfs.FATDirectoryEntry import FATDirectoryEntry, make_lfn_entry
-from pyfatfs._exceptions import PyFATException
 from pyfatfs.FatIO import FatIO
 from pyfatfs.EightDotThree import EightDotThree
 
@@ -67,7 +66,7 @@ class PyFatFS(AbstractFileSystem):
         """Clean up open handles."""
         try:
             self.fs.close()
-        except PyFATException:
+        except OSError:
             # Ignore if filesystem is already closed
             pass
 
@@ -81,7 +80,7 @@ class PyFatFS(AbstractFileSystem):
         """
         try:
             self.fs.root_dir.get_entry(path)
-        except PyFATException as e:
+        except OSError as e:
             if e.errno == errno.ENOENT:
                 return False
             raise e
@@ -98,9 +97,9 @@ class PyFatFS(AbstractFileSystem):
         # TODO remove dead code
         try:
             entry = self.fs.root_dir.get_entry(path)
-        except PyFATException as e:
+        except OSError as e:
             if e.errno in [errno.ENOTDIR, errno.ENOENT]:
-                raise ResourceNotFound(path)
+                raise FileNotFoundError(path)
             raise e
 
         info = {"basic": {"name": repr(entry),
@@ -139,9 +138,9 @@ class PyFatFS(AbstractFileSystem):
         """
         try:
             entry = self.fs.root_dir.get_entry(path)
-        except PyFATException as e:
+        except OSError as e:
             if e.errno == errno.ENOENT:
-                raise ResourceNotFound(path)
+                raise FileNotFoundError(path)
             raise e
         return entry.filesize
 
@@ -165,7 +164,7 @@ class PyFatFS(AbstractFileSystem):
         dir_entry = self._get_dir_entry(path)
         try:
             dirs, files, _ = dir_entry.get_entries()
-        except PyFATException as e:
+        except OSError as e:
             if e.errno == errno.ENOTDIR:
                 raise DirectoryExpected(path)
             raise e
@@ -185,12 +184,12 @@ class PyFatFS(AbstractFileSystem):
         # try:
         #     self.opendir(basename)
         # except DirectoryExpected:
-        #     raise ResourceNotFound(path)
+        #     raise FileNotFoundError(path)
         base = self._get_dir_entry(basename)
 
         try:
             dentry = self._get_dir_entry(path)
-        except ResourceNotFound:
+        except FileNotFoundError:
             pass
         else:
             if dentry.is_directory():
@@ -263,7 +262,7 @@ class PyFatFS(AbstractFileSystem):
 
         try:
             dentry = self._get_dir_entry(path)
-        except ResourceNotFound:
+        except FileNotFoundError:
             pass
         else:
             raise FileExistsError(path)
@@ -346,7 +345,7 @@ class PyFatFS(AbstractFileSystem):
         dir_entry = self._get_dir_entry(path)
         try:
             base = dir_entry.get_parent_dir()
-        except PyFATException as e:
+        except OSError as e:
             if e.errno == errno.ENOENT:
                 # Don't remove root directory
                 raise RemoveRootError(path)
@@ -356,7 +355,7 @@ class PyFatFS(AbstractFileSystem):
         try:
             if not dir_entry.is_empty():
                 raise DirectoryNotEmpty(path)
-        except PyFATException as e:
+        except OSError as e:
             if e.errno == errno.ENOTDIR:
                 raise DirectoryExpected(path)
 
@@ -411,7 +410,7 @@ class PyFatFS(AbstractFileSystem):
 
         :param parent_dir: ``FATDirectoryEntry``: Parent directory
         :param dir_entry: ``FATDirectoryEntry``: Directory entry to remove
-        :raises PyFATException: ``ENOENT`` if given dir entry does not exist
+        :raises OSError: ``ENOENT`` if given dir entry does not exist
                                 in ``parent_dir``
         """
         # Remove entry from parent directory
@@ -447,7 +446,7 @@ class PyFatFS(AbstractFileSystem):
             if mode.exclusive:
                 try:
                     self.info(path)
-                except ResourceNotFound:
+                except FileNotFoundError:
                     pass
                 else:
                     raise FileExists(path)
@@ -457,8 +456,8 @@ class PyFatFS(AbstractFileSystem):
 
         try:
             info = self.info(path)
-        except ResourceNotFound:
-            raise ResourceNotFound(path)
+        except FileNotFoundError:
+            raise FileNotFoundError(path)
         else:
             if info["type"][0] == "d":
                 raise FileExpected(path)
@@ -479,9 +478,9 @@ class PyFatFS(AbstractFileSystem):
         _path = normpath(path)
         try:
             dir_entry = self.fs.root_dir.get_entry(_path)
-        except PyFATException as e:
+        except OSError as e:
             if e.errno == errno.ENOENT:
-                raise ResourceNotFound(path)
+                raise FileNotFoundError(path)
             raise e
 
         return dir_entry

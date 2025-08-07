@@ -464,8 +464,7 @@ class FATDirectoryEntry:
             if entry.get_short_name() == name:
                 return entry
 
-        raise OSError(f'Cannot find entry {name}',
-                             errno=errno.ENOENT)
+        raise OSError(errno.ENOENT, f'No such file or directory: {name!r}')
 
     def get_entry(self, path: str):
         """Get sub-entry if current entry is a directory.
