@@ -94,6 +94,13 @@ def walk_files(fs, path="/"):
         for file in files:
             yield normpath(subpath + "/" + file)
 
+def clean_memory_filesystem(fs):
+    if fs.protocol == "memory":
+        # the memory filesystem is global
+        # so we have to remove previous files
+        # https://github.com/fsspec/filesystem_spec/issues/1904
+        fs.rm("/", recursive=True)
+
 UNICODE_TEXT = """
 
 UTF-8 encoded sample plain-text file
@@ -1696,6 +1703,7 @@ class FSTestCases(object):
 
         # Test copying a sub dir
         other_fs = fsspec.filesystem(protocol)
+        clean_memory_filesystem(other_fs)
         copy_dir(self.fs, "/foo", other_fs, "/")
         self.assertEqual(list(walk_files(other_fs)), ["/bar/baz/test.txt"])
 
@@ -1715,8 +1723,8 @@ class FSTestCases(object):
 
     def _test_copy_dir_write(self, protocol):
         # Test copying to this filesystem from another.
-
         other_fs = fsspec.filesystem(protocol)
+        clean_memory_filesystem(other_fs)
         self.assertEqual(other_fs.ls("/", detail=False), []) # other_fs should be empty
         other_fs.makedirs("foo/bar/baz")
         other_fs.makedir("egg")
@@ -1759,6 +1767,7 @@ class FSTestCases(object):
     def _test_move_dir_write(self, protocol):
         # Test moving to this filesystem from another.
         other_fs = fsspec.filesystem(protocol)
+        clean_memory_filesystem(other_fs)
         other_fs.makedirs("foo/bar/baz")
         other_fs.makedir("egg")
         other_fs.write_text("top.txt", "Hello, World")
@@ -1792,6 +1801,7 @@ class FSTestCases(object):
 
     def _test_move_file(self, protocol):
         other_fs = fsspec.filesystem(protocol)
+        clean_memory_filesystem(other_fs)
 
         text = "Hello, World"
         self.fs.makedir("foo").write_text("test.txt", text)
