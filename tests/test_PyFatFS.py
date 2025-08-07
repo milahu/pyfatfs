@@ -61,7 +61,7 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
         """Verify concurrent writes to files are processed sequentially."""
         from threading import Thread
         threads = []
-        self.fs.create("/WRITE.TXT")
+        self.fs.touch("/WRITE.TXT")
 
         def write_to_file(_f, _i):
             _f.write(str(_i) * 10 + "\n")
@@ -84,7 +84,7 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
         """Verify concurrent appends to files are processed sequentially."""
         from threading import Thread
         threads = []
-        self.fs.create("/APPEND.TXT")
+        self.fs.touch("/APPEND.TXT")
 
         def append_to_file(_fs, _i):
             _fs.appendtext("/APPEND.TXT", str(_i) * 10 + "\n")
@@ -210,7 +210,7 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
 
     def test_write_file_e2big(self):
         """Verify that files that are too big cannot be written."""
-        self.fs.create("/BIGBOI.TXT")
+        self.fs.touch("/BIGBOI.TXT")
         old_fat = self.fs.fs.fat.copy()
         f = self.fs.openbin("/BIGBOI.TXT", "wb")
         mock_bytes = mock.MagicMock()
@@ -222,7 +222,7 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
 
     def test_write_file_enospc(self):
         """Verify that files larger than free space cannot be written."""
-        self.fs.create("/BIGBOI.TXT")
+        self.fs.touch("/BIGBOI.TXT")
         old_fat = self.fs.fs.fat.copy()
         f = self.fs.openbin("/BIGBOI.TXT", "wb")
         mock_bytes = mock.MagicMock()
@@ -234,7 +234,7 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
 
     def test_truncate_file_e2big(self):
         """Verify that truncating past MAX_FILE_SIZE is not possible."""
-        self.fs.create("/BIGBOI.TXT")
+        self.fs.touch("/BIGBOI.TXT")
         old_fat = self.fs.fs.fat.copy()
         f = self.fs.openbin("/BIGBOI.TXT", "wb")
         with self.assertRaises(PyFATException) as e:
@@ -244,7 +244,7 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
 
     def test_truncate_file_enospc(self):
         """Verify that truncating past available disk space is not possible."""
-        self.fs.create("/BIGBOI.TXT")
+        self.fs.touch("/BIGBOI.TXT")
         old_fat = self.fs.fs.fat.copy()
         f = self.fs.openbin("/BIGBOI.TXT", "wb")
         with self.assertRaises(PyFATException) as e:
@@ -256,28 +256,28 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
         """Verify that file creation with duplicate name to a folder fails."""
         self.fs.makedir("/test")
         with self.assertRaises(ValueError):
-            self.fs.create("/test")
+            self.fs.touch("/test")
 
     def test_create_folder_file_dupe(self):
         """Verify that folder creation with duplicate name to a file fails."""
-        self.fs.create("/test")
+        self.fs.touch("/test")
         with self.assertRaises(FileExistsError):
             self.fs.makedir("/test", recreate=True)
 
     def test_create_wipe_update_mtime(self):
         """Verify that file creation updates mtime on wipe."""
-        self.fs.create("/test")
+        self.fs.touch("/test")
         self.fs.settimes("/test", datetime(1999, 12, 31, 23, 59, 59, 9999),
                          datetime(2000, 1, 1, 0, 0, 0, 0))
         orig_info = self.fs.getinfo("/test")
-        self.fs.create("/test", wipe=True)
+        self.fs.touch("/test", wipe=True)
         new_info = self.fs.getinfo("/test")
         assert orig_info != new_info
 
     def test_writetest_truncates(self):
         """Verify that writetest() properly truncates file contents."""
         fname = "/truncatetest.txt"
-        self.fs.create(fname)
+        self.fs.touch(fname)
         self.fs.writetext(fname, '0' * 64)
         assert self.fs.readtext(fname) == '0' * 64
         self.fs.writetext(fname, '1' * 16)

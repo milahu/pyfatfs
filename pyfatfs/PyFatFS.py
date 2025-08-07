@@ -177,7 +177,8 @@ class PyFatFS(AbstractFileSystem):
             raise e
         return [str(e) for e in dirs+files]
 
-    def create(self, path: str, wipe: bool = False) -> bool:
+    # TODO rename to touch?
+    def _create(self, path: str, wipe: bool = False) -> bool:
         """Create a new file.
 
         :param path: Path of new file on filesystem
