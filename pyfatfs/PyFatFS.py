@@ -434,7 +434,7 @@ class PyFatFS(AbstractFileSystem):
             self.fs.free_cluster_chain(dir_entry.get_cluster())
         del dir_entry
 
-    def openbin(self, path: str, mode: str = "r",
+    def open(self, path: str, mode: str = "r",
                 buffering: int = -1, **options):
         """Open file from filesystem.
 

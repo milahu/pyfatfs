@@ -212,7 +212,7 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
         """Verify that files that are too big cannot be written."""
         self.fs.touch("/BIGBOI.TXT")
         old_fat = self.fs.fs.fat.copy()
-        f = self.fs.openbin("/BIGBOI.TXT", "wb")
+        f = self.fs.open("/BIGBOI.TXT", "wb")
         mock_bytes = mock.MagicMock()
         mock_bytes.__len__.return_value = FATDirectoryEntry.MAX_FILE_SIZE+1
         with self.assertRaises(PyFATException) as e:
@@ -224,7 +224,7 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
         """Verify that files larger than free space cannot be written."""
         self.fs.touch("/BIGBOI.TXT")
         old_fat = self.fs.fs.fat.copy()
-        f = self.fs.openbin("/BIGBOI.TXT", "wb")
+        f = self.fs.open("/BIGBOI.TXT", "wb")
         mock_bytes = mock.MagicMock()
         mock_bytes.__len__.return_value = FATDirectoryEntry.MAX_FILE_SIZE
         with self.assertRaises(PyFATException) as e:
@@ -236,7 +236,7 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
         """Verify that truncating past MAX_FILE_SIZE is not possible."""
         self.fs.touch("/BIGBOI.TXT")
         old_fat = self.fs.fs.fat.copy()
-        f = self.fs.openbin("/BIGBOI.TXT", "wb")
+        f = self.fs.open("/BIGBOI.TXT", "wb")
         with self.assertRaises(PyFATException) as e:
             f.truncate(FATDirectoryEntry.MAX_FILE_SIZE+1)
         self.assertEqual(errno.E2BIG, e.exception.errno)
@@ -246,7 +246,7 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
         """Verify that truncating past available disk space is not possible."""
         self.fs.touch("/BIGBOI.TXT")
         old_fat = self.fs.fs.fat.copy()
-        f = self.fs.openbin("/BIGBOI.TXT", "wb")
+        f = self.fs.open("/BIGBOI.TXT", "wb")
         with self.assertRaises(PyFATException) as e:
             f.truncate(FATDirectoryEntry.MAX_FILE_SIZE)
         self.assertEqual(errno.ENOSPC, e.exception.errno)
