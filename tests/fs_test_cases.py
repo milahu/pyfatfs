@@ -1267,8 +1267,10 @@ class FSTestCases(object):
         with get_filesystem("tempdir") as src_fs:
             src_fs.write_bytes("foo", self.data1)
             src_fs.write_bytes("bar", self.data2)
-            src_fs.makedir("dir1").write_bytes("baz", self.data3)
-            src_fs.makedirs("dir2/dir3").write_bytes("egg", self.data4)
+            src_fs.makedir("dir1")
+            src_fs.write_bytes("dir1/baz", self.data3)
+            src_fs.makedirs("dir2/dir3")
+            src_fs.write_bytes("dir2/dir3/egg", self.data4)
             dst_fs = self.fs
             copy_fs(src_fs, dst_fs, workers=workers)
             self.assertEqual(dst_fs.read_bytes("foo"), self.data1)
@@ -1294,8 +1296,10 @@ class FSTestCases(object):
         with get_filesystem("tempdir") as dst_fs:
             src_fs.write_bytes("foo", self.data1)
             src_fs.write_bytes("bar", self.data2)
-            src_fs.makedir("dir1").write_bytes("baz", self.data3)
-            src_fs.makedirs("dir2/dir3").write_bytes("egg", self.data4)
+            src_fs.makedir("dir1")
+            src_fs.write_bytes("dir1/baz", self.data3)
+            src_fs.makedirs("dir2/dir3")
+            src_fs.write_bytes("dir2/dir3/egg", self.data4)
             copy_fs(src_fs, dst_fs, workers=workers)
             self.assertEqual(dst_fs.read_bytes("foo"), self.data1)
             self.assertEqual(dst_fs.read_bytes("bar"), self.data2)
