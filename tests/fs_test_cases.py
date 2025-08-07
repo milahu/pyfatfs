@@ -1251,7 +1251,7 @@ class FSTestCases(object):
 
     def _test_upload(self, workers):
         """Test copy_fs with varying number of worker threads."""
-        with fsspec.filesystem("temp://") as src_fs:
+        with fsspec.filesystem("tempdir") as src_fs:
             src_fs.write_bytes("foo", self.data1)
             src_fs.write_bytes("bar", self.data2)
             src_fs.makedir("dir1").write_bytes("baz", self.data3)
@@ -1278,7 +1278,7 @@ class FSTestCases(object):
     def _test_download(self, workers):
         """Test copy_fs with varying number of worker threads."""
         src_fs = self.fs
-        with fsspec.filesystem("temp://") as dst_fs:
+        with fsspec.filesystem("tempdir") as dst_fs:
             src_fs.write_bytes("foo", self.data1)
             src_fs.write_bytes("bar", self.data2)
             src_fs.makedir("dir1").write_bytes("baz", self.data3)
@@ -1751,8 +1751,8 @@ class FSTestCases(object):
 
     def test_copy_dir_temp(self):
         # Test copy_dir with a temp fs.
-        self._test_copy_dir("temp://")
-        self._test_copy_dir_write("temp://")
+        self._test_copy_dir("tempdir")
+        self._test_copy_dir_write("tempdir")
 
     def test_move_dir_same_fs(self):
         self.fs.makedirs("foo/bar/baz")
@@ -1793,7 +1793,7 @@ class FSTestCases(object):
         self._test_move_dir_write("memory")
 
     def test_move_dir_temp(self):
-        self._test_move_dir_write("temp://")
+        self._test_move_dir_write("tempdir")
 
     def test_move_file_same_fs(self):
         text = "Hello, World"
@@ -1828,7 +1828,7 @@ class FSTestCases(object):
         self._test_move_file("memory")
 
     def test_move_file_temp(self):
-        self._test_move_file("temp://")
+        self._test_move_file("tempdir")
 
     # def test_move_file_onto_itself(self):
     #     self.fs.write_text("file.txt", "Hello")
