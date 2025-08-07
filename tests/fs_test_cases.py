@@ -386,7 +386,7 @@ class FSTestCases(object):
 
         """
         assert isinstance(contents, bytes)
-        data = self.fs.readbytes(path)
+        data = self.fs.read_bytes(path)
         self.assertEqual(data, contents)
         self.assertIsInstance(data, bytes)
 
@@ -1039,8 +1039,8 @@ class FSTestCases(object):
             six.assertCountEqual(self, foo_fs.listdir("/"), ["bar", "egg"])
             self.assertTrue(foo_fs.isfile("bar"))
             self.assertTrue(foo_fs.isfile("egg"))
-            self.assertEqual(foo_fs.readbytes("bar"), b"barbar")
-            self.assertEqual(foo_fs.readbytes("egg"), b"eggegg")
+            self.assertEqual(foo_fs.read_bytes("bar"), b"barbar")
+            self.assertEqual(foo_fs.read_bytes("egg"), b"eggegg")
 
         self.assertFalse(self.fs.isclosed())
 
@@ -1264,10 +1264,10 @@ class FSTestCases(object):
             src_fs.makedirs("dir2/dir3").writebytes("egg", self.data4)
             dst_fs = self.fs
             copy_fs(src_fs, dst_fs, workers=workers)
-            self.assertEqual(dst_fs.readbytes("foo"), self.data1)
-            self.assertEqual(dst_fs.readbytes("bar"), self.data2)
-            self.assertEqual(dst_fs.readbytes("dir1/baz"), self.data3)
-            self.assertEqual(dst_fs.readbytes("dir2/dir3/egg"), self.data4)
+            self.assertEqual(dst_fs.read_bytes("foo"), self.data1)
+            self.assertEqual(dst_fs.read_bytes("bar"), self.data2)
+            self.assertEqual(dst_fs.read_bytes("dir1/baz"), self.data3)
+            self.assertEqual(dst_fs.read_bytes("dir2/dir3/egg"), self.data4)
 
     def test_upload_0(self):
         self._test_upload(0)
@@ -1290,10 +1290,10 @@ class FSTestCases(object):
             src_fs.makedir("dir1").writebytes("baz", self.data3)
             src_fs.makedirs("dir2/dir3").writebytes("egg", self.data4)
             copy_fs(src_fs, dst_fs, workers=workers)
-            self.assertEqual(dst_fs.readbytes("foo"), self.data1)
-            self.assertEqual(dst_fs.readbytes("bar"), self.data2)
-            self.assertEqual(dst_fs.readbytes("dir1/baz"), self.data3)
-            self.assertEqual(dst_fs.readbytes("dir2/dir3/egg"), self.data4)
+            self.assertEqual(dst_fs.read_bytes("foo"), self.data1)
+            self.assertEqual(dst_fs.read_bytes("bar"), self.data2)
+            self.assertEqual(dst_fs.read_bytes("dir1/baz"), self.data3)
+            self.assertEqual(dst_fs.read_bytes("dir2/dir3/egg"), self.data4)
 
     def test_download_0(self):
         self._test_download(0)
@@ -1464,17 +1464,17 @@ class FSTestCases(object):
         all_bytes = b"".join(six.int2byte(n) for n in range(256))
         with self.fs.open("foo", "wb") as f:
             f.write(all_bytes)
-        self.assertEqual(self.fs.readbytes("foo"), all_bytes)
-        _all_bytes = self.fs.readbytes("foo")
+        self.assertEqual(self.fs.read_bytes("foo"), all_bytes)
+        _all_bytes = self.fs.read_bytes("foo")
         self.assertIsInstance(_all_bytes, bytes)
         self.assertEqual(_all_bytes, all_bytes)
 
         with self.assertRaises(FileNotFoundError):
-            self.fs.readbytes("foo/bar")
+            self.fs.read_bytes("foo/bar")
 
         self.fs.makedir("baz")
         with self.assertRaises(IsADirectoryError):
-            self.fs.readbytes("baz")
+            self.fs.read_bytes("baz")
 
     def test_download(self):
         test_bytes = b"Hello, World"
