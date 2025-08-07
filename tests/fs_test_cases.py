@@ -25,6 +25,7 @@ from pyfatfs.path import split, normpath
 import fsspec
 import fsspec.implementations.dirfs
 import fsspec.implementations.local
+import fsspec.implementations.memory
 
 if six.PY2:
     import collections as collections_abc
@@ -105,12 +106,12 @@ def walk_dirs(fs, path="/"):
             yield normpath(subpath + "/" + _dir)
 
 class TempdirFileSystem(fsspec.implementations.dirfs.DirFileSystem):
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.tempdir = tempfile.mkdtemp(prefix="pyfatfs-test-")
         self.local_fs = fsspec.implementations.local.LocalFileSystem(
-            use_listings_cache=False,
+            **kwargs,
         )
-        super().__init__(path=self.tempdir, fs=self.local_fs)
+        super().__init__(path=self.tempdir, fs=self.local_fs, **kwargs)
     # FIXME TypeError: 'TempdirFileSystem' object does not support the context manager protocol
     # def __enter__(self):
     #     # FIXME AttributeError: 'super' object has no attribute '__enter__'
@@ -126,9 +127,17 @@ class TempdirFileSystem(fsspec.implementations.dirfs.DirFileSystem):
 #     pass
 
 def get_filesystem(protocol):
+    kwargs = {
+        # debug: disable caching
+        "use_listings_cache": False,
+        "skip_instance_cache": True,
+    }
     if protocol == "tempdir":
-        return TempdirFileSystem()
-    fs = fsspec.filesystem(protocol)
+        fs = TempdirFileSystem(**kwargs)
+    elif protocol == "memory":
+        fs = fsspec.implementations.memory.MemoryFileSystem(**kwargs)
+    else:
+        fs = fsspec.filesystem(protocol, **kwargs)
     if protocol == "memory":
         # the memory filesystem is global
         # so we have to remove previous files
