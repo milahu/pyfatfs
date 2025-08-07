@@ -464,7 +464,7 @@ class FATDirectoryEntry:
             if entry.get_short_name() == name:
                 return entry
 
-        raise PyFATException(f'Cannot find entry {name}',
+        raise OSError(f'Cannot find entry {name}',
                              errno=errno.ENOENT)
 
     def get_entry(self, path: str):
