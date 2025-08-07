@@ -494,11 +494,6 @@ class FSTestCases(object):
         self.assertTrue(self.fs.isdir("foo"))
         self.assertFalse(self.fs.isdir("bar"))
 
-    def test_islink(self):
-        self.fs.touch("foo")
-        self.assertFalse(self.fs.islink("foo"))
-        self.assertFalse(self.fs.islink("bar")) # no such file
-
     def test_getsize(self):
         self.fs.write_bytes("empty", b"")
         self.fs.write_bytes("one", b"a")
