@@ -17,6 +17,7 @@ from pyfatfs.info import Info
 from pyfatfs.errors import DirectoryExpected, \
     FileExpected, DirectoryNotEmpty, RemoveRootError, \
     FileExists
+from pyfatfs._exceptions import PyFATException
 
 from pyfatfs import FAT_OEM_ENCODING
 from pyfatfs.DosDateTime import DosDateTime
@@ -408,7 +409,7 @@ class PyFatFS(AbstractFileSystem):
         except RemoveRootError:
             pass
 
-    def remove(self, path: str):
+    def _rm_file_check(self, path: str):
         """Remove a file from the filesystem.
 
         :param path: `str`: Path of file to remove
@@ -420,6 +421,19 @@ class PyFatFS(AbstractFileSystem):
             raise FileExpected(path)
 
         base = dir_entry.get_parent_dir()
+        self._remove(base, dir_entry)
+
+    def rm_file(self, path):
+        """Remove a file from the filesystem.
+
+        :param path: `str`: Path of file to remove
+        """
+        dir_entry = self._get_dir_entry(path)
+        try:
+            base = dir_entry.get_parent_dir()
+        except PyFATException:
+            # Cannot query parent directory of root directory
+            return
         self._remove(base, dir_entry)
 
     def _remove(self, parent_dir: FATDirectoryEntry,
