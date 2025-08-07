@@ -7,7 +7,6 @@ from datetime import datetime
 from unittest import TestCase, mock
 from io import BytesIO
 
-from fsspec.test import fsspecTestCases
 from pyfatfs import PyFATException
 from pyfatfs.FATDirectoryEntry import FATDirectoryEntry
 
