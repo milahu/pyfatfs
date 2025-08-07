@@ -173,16 +173,18 @@ class PyFatFS(AbstractFileSystem):
             return [str(e) for e in dirs+files]
         # no. we already have all infos
         # return list(map(self.info, dirs+files))
+        path = normpath(path)
+        path_prefix = "" if (path == "/") else (path + "/")
         infos = []
         for entry in dirs:
             infos.append({
-                "name": str(entry),
+                "name": path_prefix + str(entry),
                 "type": "directory",
                 "size": 0,
             })
         for entry in files:
             infos.append({
-                "name": str(entry),
+                "name": path_prefix + str(entry),
                 "type": "file",
                 "size": entry.filesize,
             })
