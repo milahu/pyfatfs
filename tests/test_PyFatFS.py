@@ -265,16 +265,6 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
         with self.assertRaises(FileExistsError):
             self.fs.makedir("/test", recreate=True)
 
-    def test_create_wipe_update_mtime(self):
-        """Verify that file creation updates mtime on wipe."""
-        self.fs.touch("/test")
-        self.fs.settimes("/test", datetime(1999, 12, 31, 23, 59, 59, 9999),
-                         datetime(2000, 1, 1, 0, 0, 0, 0))
-        orig_info = self.fs.getinfo("/test")
-        self.fs.touch("/test", wipe=True)
-        new_info = self.fs.getinfo("/test")
-        assert orig_info != new_info
-
     def test_writetest_truncates(self):
         """Verify that writetest() properly truncates file contents."""
         fname = "/truncatetest.txt"

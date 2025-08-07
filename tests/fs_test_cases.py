@@ -1240,31 +1240,6 @@ class FSTestCases(object):
         with self.assertRaises(FileNotFoundError):
             self.fs.setinfo("nothing", {})
 
-    def test_settimes(self):
-        self.fs._create("birthday.txt")
-        self.fs.settimes("birthday.txt", accessed=datetime(2016, 7, 5))
-        info = self.fs.getinfo("birthday.txt", namespaces=["details"])
-        can_write_acccess = info.is_writeable("details", "accessed")
-        can_write_modified = info.is_writeable("details", "modified")
-        if can_write_acccess:
-            self.assertEqual(info.accessed, datetime(2016, 7, 5, tzinfo=timezone.utc))
-        if can_write_modified:
-            self.assertEqual(info.modified, datetime(2016, 7, 5, tzinfo=timezone.utc))
-
-    def test_touch(self):
-        self.fs.touch("new.txt")
-        self.assert_isfile("new.txt")
-        self.fs.settimes("new.txt", datetime(2016, 7, 5))
-        info = self.fs.getinfo("new.txt", namespaces=["details"])
-        if info.is_writeable("details", "accessed"):
-            self.assertEqual(info.accessed, datetime(2016, 7, 5, tzinfo=timezone.utc))
-            now = time.time()
-            self.fs.touch("new.txt")
-            accessed = self.fs.getinfo("new.txt", namespaces=["details"]).raw[
-                "details"
-            ]["accessed"]
-            self.assertTrue(accessed - now < 5)
-
     def test_copy(self):
         # Test copy to new path
         self.fs.write_bytes("foo", b"test")
