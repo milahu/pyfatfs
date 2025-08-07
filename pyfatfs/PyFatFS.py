@@ -10,7 +10,7 @@ from typing import Union
 
 from fsspec import AbstractFileSystem
 from pyfatfs.mode import Mode
-from fsspec.path import split, normpath
+from pyfatfs.path import split, normpath
 from fsspec.permissions import Permissions
 from fsspec.info import Info
 from fsspec.errors import DirectoryExpected, DirectoryExists, \
