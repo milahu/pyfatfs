@@ -109,7 +109,7 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
 
         def create_dentries(fs, i):
             for n in range(0, 50):
-                fs.makedirs(f"/root/{n}DIR", recreate=True)
+                fs.makedirs(f"/root/{n}DIR", exist_ok=True)
                 fs.touch(f"/root/{n}.dat")
                 fs.touch(f"/root/{n}DIR/{n}.dat")
             fs.touch(f"/root/{i}.txt")
@@ -189,7 +189,7 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
                 "/0/1/2/3/4/5/6/8/9",
                 "/0/1/2/3/4/5/6/8/9/10/11/12/13/14/15/16"]
         for d in dirs:
-            fs1.makedirs(d, recreate=True)
+            fs1.makedirs(d, exist_ok=True)
             fs1.touch(os.path.join(d, "FILE1.TXT"))
             fs1.touch(os.path.join(d, "This requires an LFN entry.TxT"))
             fs1.touch(os.path.join(d, "FILE2.TXT"))
@@ -263,7 +263,7 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
         """Verify that folder creation with duplicate name to a file fails."""
         self.fs.touch("/test")
         with self.assertRaises(FileExistsError):
-            self.fs.makedir("/test", recreate=True)
+            self.fs.makedir("/test")
 
     def test_writetest_truncates(self):
         """Verify that writetest() properly truncates file contents."""
