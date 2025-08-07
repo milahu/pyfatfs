@@ -157,7 +157,7 @@ class PyFatFS(AbstractFileSystem):
 
         return "file"
 
-    def listdir(self, path: str):
+    def ls(self, path, detail=True, **kwargs):
         """List contents of given directory entry.
 
         :param path: Path to directory on filesystem
@@ -169,7 +169,23 @@ class PyFatFS(AbstractFileSystem):
             if e.errno == errno.ENOTDIR:
                 raise DirectoryExpected(path)
             raise e
-        return [str(e) for e in dirs+files]
+        if not detail:
+            return [str(e) for e in dirs+files]
+        # no. we already know entry types
+        # return list(map(self.info, dirs+files))
+        infos = []
+        for path in dirs:
+            infos.append({
+                "path": path,
+                "type": "directory",
+                "size": 0,
+            })
+        for path in files:
+            infos.append({
+                "path": path,
+                "type": "file",
+                "size": self._getsize(path),
+            })
 
     def _create(self, path: str, wipe: bool = False) -> bool:
         """Create a new file.
