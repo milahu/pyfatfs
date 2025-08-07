@@ -322,7 +322,8 @@ class FSTestCases(object):
                 by `~fs.test.FSTestCases.make_fs`.
 
         """
-        fs.close()
+        pass
+        # fs.close()
 
     def setUp(self):
         self.fs = self.make_fs()
