@@ -13,6 +13,7 @@ import json
 import os
 import six
 import time
+import shutil
 import unittest
 import warnings
 from datetime import datetime
