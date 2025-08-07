@@ -13,10 +13,9 @@ from pyfatfs.mode import Mode
 from pyfatfs.path import split, normpath
 from pyfatfs.permissions import Permissions
 from pyfatfs.info import Info
-from pyfatfs.errors import DirectoryExpected, DirectoryExists, \
+from pyfatfs.errors import DirectoryExpected, \
     ResourceNotFound, FileExpected, DirectoryNotEmpty, RemoveRootError, \
     FileExists
-from fsspec.subfs import SubFS
 
 from pyfatfs import FAT_OEM_ENCODING
 from pyfatfs.DosDateTime import DosDateTime
@@ -237,14 +236,24 @@ class PyFatFS(AbstractFileSystem):
         self.fs.flush_fat()
         return True
 
-    def makedir(self, path: str, permissions: Permissions = None,
-                recreate: bool = False):
-        """Create directory on filesystem.
-
-        :param path: Path of new directory on filesystem
-        :param permissions: Currently not implemented
-        :param recreate: Ignore if directory already exists
+    def mkdir(self, path, create_parents=True, **kwargs):
         """
+        Create directory entry at path
+
+        For systems that don't have true directories, may create an for
+        this instance only and not touch the real filesystem
+
+        Parameters
+        ----------
+        path: str
+            location
+        create_parents: bool
+            if True, this is equivalent to ``makedirs``
+        kwargs:
+            may be permissions, etc.
+        """
+        # TODO handle create_parents
+        # TODO handle kwargs["permissions"]
         path = normpath(path)
         base = split(path)[0]
         dirname = split(path)[1]
@@ -253,7 +262,7 @@ class PyFatFS(AbstractFileSystem):
         try:
             self.opendir(base)
         except DirectoryExpected:
-            raise ResourceNotFound(path)
+            raise FileNotFoundError(base)
         base = self._get_dir_entry(base)
 
         try:
@@ -261,10 +270,7 @@ class PyFatFS(AbstractFileSystem):
         except ResourceNotFound:
             pass
         else:
-            if not recreate or not dentry.is_directory():
-                raise DirectoryExists(path)
-            else:
-                return SubFS(self, path)
+            raise FileExistsError(path)
 
         parent_is_root = base == self.fs.root_dir
 
@@ -316,7 +322,25 @@ class PyFatFS(AbstractFileSystem):
         # Flush FAT(s) to disk
         self.fs.flush_fat()
 
-        return SubFS(self, path)
+    def makedirs(self, path, exist_ok=False):
+        """Recursively make directories
+
+        Creates directory at path and any intervening required directories.
+        Raises exception if, for instance, the path already exists but is a
+        file.
+
+        Parameters
+        ----------
+        path: str
+            leaf directory name
+        exist_ok: bool (False)
+            If False, will error if the target already exists
+        """
+        try:
+            self.mkdir(path)
+        except FileExistsError:
+            if not exist_ok:
+                raise
 
     def removedir(self, path: str):
         """Remove empty directories from the filesystem.
@@ -457,20 +481,6 @@ class PyFatFS(AbstractFileSystem):
             raise e
 
         return dir_entry
-
-    def opendir(self, path: str, factory=None) -> SubFS:
-        """Get a filesystem object for a sub-directory.
-
-        :param path: str: Path to a directory on the filesystem.
-        """
-        factory = factory or self.subfs_class or SubFS
-
-        dir_entry = self._get_dir_entry(path)
-
-        if not dir_entry.is_directory():
-            raise DirectoryExpected(path)
-
-        return factory(self, path)
 
     def setinfo(self, path: str, info):
         """Set file meta information such as timestamps."""
