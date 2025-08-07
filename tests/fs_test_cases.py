@@ -1656,9 +1656,34 @@ class FSTestCases(object):
         self.fs.write_text("top.txt", "Hello, World")
         self.fs.write_text("/foo/bar/baz/test.txt", "Goodbye, World")
 
+        self.assertEqual(self.fs.ls("/"), [
+            {"name": "foo", "type": "directory", "size": 0},
+            {"name": "egg", "type": "directory", "size": 0},
+            {"name": "top.txt", "type": "file", "size": 12},
+        ])
+        self.assertEqual(self.fs.ls("/foo/bar/baz"), [
+            {"name": "/foo/bar/baz/test.txt", "type": "file", "size": 14},
+        ])
+        self.assertEqual(self.fs.ls("/", detail=False), ['foo', 'egg', 'top.txt'])
+        self.assertEqual(self.fs.ls("/foo", detail=False), ['bar'])
+        self.assertEqual(self.fs.ls("/foo/bar", detail=False), ['baz'])
+        self.assertEqual(self.fs.ls("/foo/bar/baz", detail=False), ['test.txt'])
+
+        self.assertEqual(self.fs.find("/", withdirs=True), [
+            # '/',
+            '/egg',
+            '/foo',
+            '/foo/bar',
+            '/foo/bar/baz',
+            '/foo/bar/baz/test.txt',
+            '/top.txt',
+        ])
+
+        expected = self.fs.find("/", withdirs=True)
+        expected = set(expected)
+
         self.fs.copy("/foo", "/foo2", recursive=True)
 
-        expected = {"/bar", "/bar/baz", "/bar/baz/test.txt"}
         actual = self.fs.find("/foo2", withdirs=True)
         actual = map(lambda p: p[5:], actual) # remove "/foo2" prefix
         actual = set(actual)
