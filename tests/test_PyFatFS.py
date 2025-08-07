@@ -256,8 +256,8 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
     def test_create_file_folder_dupe(self):
         """Verify that file creation with duplicate name to a folder fails."""
         self.fs.makedir("/test")
-        with self.assertRaises(ValueError):
-            self.fs.touch("/test")
+        with self.assertRaises(FileExistsError):
+            self.fs._create("/test")
 
     def test_create_folder_file_dupe(self):
         """Verify that folder creation with duplicate name to a file fails."""

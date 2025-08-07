@@ -214,7 +214,7 @@ class PyFatFS(AbstractFileSystem):
             pass
         else:
             if dentry.is_directory():
-                raise FileExpected(path)
+                raise FileExistsError(path)
             if not wipe:
                 return False
             else:
