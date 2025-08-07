@@ -12,6 +12,7 @@ from pyfatfs.FATDirectoryEntry import FATDirectoryEntry
 
 from pyfatfs.PyFat import PyFat
 from pyfatfs.PyFatFS import PyFatBytesIOFS
+from fs_test_cases import FSTestCases
 
 
 def _make_fs(fat_type: int, **kwargs) -> (PyFatBytesIOFS, BytesIO):
