@@ -443,7 +443,7 @@ class PyFatFS(AbstractFileSystem):
         :param buffering: TBD
         :returns: `BinaryIO` stream
         """
-        path = self.validatepath(path)
+        # path = self.validatepath(path)
         mode = Mode(mode + 'b')
         if mode.create:
             if mode.exclusive:
@@ -473,7 +473,8 @@ class PyFatFS(AbstractFileSystem):
         :param path: `str`: Path on the filesystem
         :returns: `FATDirectoryEntry`
         """
-        _path = normpath(self.validatepath(path))
+        # _path = normpath(self.validatepath(path))
+        _path = normpath(path)
         try:
             dir_entry = self.fs.root_dir.get_entry(_path)
         except PyFATException as e:
