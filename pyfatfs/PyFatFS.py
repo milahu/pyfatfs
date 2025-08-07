@@ -496,6 +496,10 @@ class PyFatFS(AbstractFileSystem):
         # FIXME handle path2 exists
         # https://github.com/fsspec/filesystem_spec/issues/909#issuecomment-1204212507
         # copy from one filesystem to the other
+        # fs.copy expects dir2 to exist
+        dir2 = split(path2)[0]
+        if dir2:
+            self.makedirs(dir2, exist_ok=True)
         with (
             self.open(path1, "rb") as f1,
             self.open(path2, "wb") as f2
