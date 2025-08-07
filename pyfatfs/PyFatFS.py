@@ -478,6 +478,9 @@ class PyFatFS(AbstractFileSystem):
         :param buffering: TBD
         :returns: `BinaryIO` stream
         """
+        # FIXME restore validatepath?
+        if "\0" in path:
+            raise ValueError("embedded null byte")
         # path = self.validatepath(path)
         # FIXME handle text mode
         # mode = Mode(mode + 'b')
