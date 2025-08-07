@@ -332,11 +332,15 @@ class PyFatFS(AbstractFileSystem):
         exist_ok: bool (False)
             If False, will error if the target already exists
         """
-        try:
-            self.mkdir(path)
-        except FileExistsError:
-            if not exist_ok:
-                raise
+        path = normpath(path)
+        parts = path.split("/")
+        for num_parts in range(1, len(parts) + 1):
+            try:
+                self.mkdir("/".join(parts[:num_parts]))
+            except FileExistsError:
+                if not exist_ok:
+                    raise
+                break
 
     def removedir(self, path: str):
         """Remove empty directories from the filesystem.
