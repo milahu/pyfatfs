@@ -1647,7 +1647,7 @@ class FSTestCases(object):
         self.fs.copy("foo.txt", "bar.txt")
         self.assert_bytes("bar.txt", bytes_test)
 
-    def _test_copy_dir(self):
+    def _test_copy_dir(self, protocol="mem://"):
         # Test copy_dir.
 
         self.fs.makedirs("foo/bar/baz")
@@ -1665,7 +1665,7 @@ class FSTestCases(object):
         self.assert_text("/foo2/bar/baz/test.txt", "Goodbye, World")
 
         # Test copying a sub dir
-        other_fs = fsspec.open("mem://")
+        other_fs = fsspec.open(protocol)
         copy_dir(self.fs, "/foo", other_fs, "/")
         self.assertEqual(list(walk_files(other_fs)), ["/bar/baz/test.txt"])
 
