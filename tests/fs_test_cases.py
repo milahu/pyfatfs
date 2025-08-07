@@ -112,15 +112,14 @@ class TempdirFileSystem(fsspec.implementations.dirfs.DirFileSystem):
             **kwargs,
         )
         super().__init__(path=self.tempdir, fs=self.local_fs, **kwargs)
-    # FIXME TypeError: 'TempdirFileSystem' object does not support the context manager protocol
-    # def __enter__(self):
-    #     # FIXME AttributeError: 'super' object has no attribute '__enter__'
-    #     super().__enter__
-    # def __exit__(self):
-    #     shutil.rmtree(self.tempdir)
-    #     super().__exit__()
+    def __enter__(self):
+        return self
+    def __exit__(self, *exc):
+        if os.path.exists(self.tempdir):
+            shutil.rmtree(self.tempdir)
     def __del__(self):
-        shutil.rmtree(self.tempdir)
+        if os.path.exists(self.tempdir):
+            shutil.rmtree(self.tempdir)
 
 # # test
 # with TempdirFileSystem() as d:
