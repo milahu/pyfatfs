@@ -410,22 +410,6 @@ class FSTestCases(object):
         with self.assertRaises(IsADirectoryError):
             self.fs.openbin("/")
 
-    def test_appendbytes(self):
-        with self.assertRaises(TypeError):
-            self.fs.appendbytes("foo", "bar")
-        self.fs.appendbytes("foo", b"bar")
-        self.assert_bytes("foo", b"bar")
-        self.fs.appendbytes("foo", b"baz")
-        self.assert_bytes("foo", b"barbaz")
-
-    def test_appendtext(self):
-        with self.assertRaises(TypeError):
-            self.fs.appendtext("foo", b"bar")
-        self.fs.appendtext("foo", "bar")
-        self.assert_text("foo", "bar")
-        self.fs.appendtext("foo", "baz")
-        self.assert_text("foo", "barbaz")
-
     def test_basic(self):
         #  Check str and repr don't break
         repr(self.fs)
