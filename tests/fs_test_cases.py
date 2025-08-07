@@ -58,8 +58,10 @@ def copy_dir(fs1, path1, fs2, path2):
         assert path1 != path2
     path1 = fs1._strip_protocol(path1)
     path2 = fs2._strip_protocol(path2)
-    path1 = os.path.normpath(path1)
-    path2 = os.path.normpath(path2)
+    # no. os.path.normpath would turn "" into "."
+    # which creates ugly paths starting with "/./"
+    # path1 = os.path.normpath(path1)
+    # path2 = os.path.normpath(path2)
     for subpath1, dirs, files in fs1.walk(path1):
         subpath2 = path2 + subpath1[len(path1):]
         for _dir in dirs:
