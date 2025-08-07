@@ -1648,7 +1648,7 @@ class FSTestCases(object):
         self.fs.copy("foo.txt", "bar.txt")
         self.assert_bytes("bar.txt", bytes_test)
 
-    def _test_copy_dir(self, protocol="mem://"):
+    def _test_copy_dir(self, protocol="memory"):
         # Test copy_dir.
 
         self.fs.makedirs("foo/bar/baz")
@@ -1729,8 +1729,8 @@ class FSTestCases(object):
 
     def test_copy_dir_mem(self):
         # Test copy_dir with a mem fs.
-        self._test_copy_dir("mem://")
-        self._test_copy_dir_write("mem://")
+        self._test_copy_dir("memory")
+        self._test_copy_dir_write("memory")
 
     def test_copy_dir_temp(self):
         # Test copy_dir with a temp fs.
@@ -1772,7 +1772,7 @@ class FSTestCases(object):
         self.assert_text("/foo/bar/baz/test.txt", "Goodbye, World")
 
     def test_move_dir_mem(self):
-        self._test_move_dir_write("mem://")
+        self._test_move_dir_write("memory")
 
     def test_move_dir_temp(self):
         self._test_move_dir_write("temp://")
@@ -1806,7 +1806,7 @@ class FSTestCases(object):
         self.assertEqual(other_fs.readtext("foo/test2.txt"), text)
 
     def test_move_file_mem(self):
-        self._test_move_file("mem://")
+        self._test_move_file("memory")
 
     def test_move_file_temp(self):
         self._test_move_file("temp://")
