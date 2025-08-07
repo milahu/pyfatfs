@@ -123,6 +123,7 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
         for t in threads:
             t.join()
         in_memory_fs.seek(0)
+        # FIXME UserWarning: Filesystem was not cleanly unmounted on last access.
         fs = PyFatBytesIOFS(BytesIO(in_memory_fs.read()),
                             encoding='UTF-8', lazy_load=True)
         expected_dentries_root = []
@@ -133,7 +134,8 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
             expected_dentries_sub.append(f"{i}DIR/{i}.dat")
         for i in range(0, 10):
             expected_dentries_root.append(f"{i}.txt")
-        assert fs.listdir("/root").sort() == expected_dentries_root.sort()
+        self.assertEqual(fs.ls("/", detail=False), ["root"])
+        assert fs.listdir("/root", detail=False).sort() == expected_dentries_root.sort()
         for i in range(0, 10):
             self.assertEqual(fs.listdir(f"/root/{i}DIR").sort(),
                              expected_dentries_sub.sort())
