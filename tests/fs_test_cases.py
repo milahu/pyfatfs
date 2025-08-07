@@ -94,6 +94,11 @@ def walk_files(fs, path="/"):
         for file in files:
             yield normpath(subpath + "/" + file)
 
+def walk_dirs(fs, path="/"):
+    for subpath, dirs, files in fs.walk(path):
+        for _dir in dirs:
+            yield normpath(subpath + "/" + _dir)
+
 def clean_memory_filesystem(fs):
     if fs.protocol == "memory":
         # the memory filesystem is global
@@ -1732,7 +1737,7 @@ class FSTestCases(object):
         other_fs.write_text("/foo/bar/baz/test.txt", "Goodbye, World")
         copy_dir(other_fs, "/", self.fs, "/")
         expected = {"/egg", "/foo", "/foo/bar", "/foo/bar/baz"}
-        self.assertEqual(set(walk.walk_dirs(self.fs)), expected)
+        self.assertEqual(set(walk_dirs(self.fs)), expected)
         self.assert_text("top.txt", "Hello, World")
         self.assert_text("/foo/bar/baz/test.txt", "Goodbye, World")
 
@@ -1755,7 +1760,7 @@ class FSTestCases(object):
         fs.move.move_dir(self.fs, "foo", self.fs, "foo2")
 
         expected = {"/egg", "/foo2", "/foo2/bar", "/foo2/bar/baz"}
-        self.assertEqual(set(walk.walk_dirs(self.fs)), expected)
+        self.assertEqual(set(walk_dirs(self.fs)), expected)
         self.assert_text("top.txt", "Hello, World")
         self.assert_text("/foo2/bar/baz/test.txt", "Goodbye, World")
 
@@ -1777,7 +1782,7 @@ class FSTestCases(object):
 
         expected = {"/egg", "/foo", "/foo/bar", "/foo/bar/baz"}
         self.assertEqual(other_fs.listdir("/"), [])
-        self.assertEqual(set(walk.walk_dirs(self.fs)), expected)
+        self.assertEqual(set(walk_dirs(self.fs)), expected)
         self.assert_text("top.txt", "Hello, World")
         self.assert_text("/foo/bar/baz/test.txt", "Goodbye, World")
 
