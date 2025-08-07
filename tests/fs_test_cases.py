@@ -1679,7 +1679,8 @@ class FSTestCases(object):
             '/top.txt',
         ])
 
-        expected = self.fs.find("/", withdirs=True)
+        expected = self.fs.find("/foo", withdirs=True)
+        expected = map(lambda p: p[4:], expected) # remove "/foo" prefix
         expected = set(expected)
 
         self.fs.copy("/foo", "/foo2", recursive=True)
