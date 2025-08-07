@@ -177,7 +177,6 @@ class PyFatFS(AbstractFileSystem):
             raise e
         return [str(e) for e in dirs+files]
 
-    # TODO rename to touch?
     def _create(self, path: str, wipe: bool = False) -> bool:
         """Create a new file.
 
@@ -453,7 +452,7 @@ class PyFatFS(AbstractFileSystem):
                     pass
                 else:
                     raise FileExists(path)
-            self.create(path)
+            self._create(path)
         if "t" in mode:
             raise ValueError('Text-mode not allowed in openbin')
 
