@@ -7,7 +7,6 @@ from datetime import datetime
 from unittest import TestCase, mock
 from io import BytesIO
 
-import fsspec.errors as fs_errors
 from fsspec.test import fsspecTestCases
 from pyfatfs import PyFATException
 from pyfatfs.FATDirectoryEntry import FATDirectoryEntry
@@ -256,13 +255,13 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
     def test_create_file_folder_dupe(self):
         """Verify that file creation with duplicate name to a folder fails."""
         self.fs.makedir("/test")
-        with self.assertRaises(fs_errors.FileExpected):
+        with self.assertRaises(ValueError):
             self.fs.create("/test")
 
     def test_create_folder_file_dupe(self):
         """Verify that folder creation with duplicate name to a file fails."""
         self.fs.create("/test")
-        with self.assertRaises(fs_errors.DirectoryExists):
+        with self.assertRaises(FileExistsError):
             self.fs.makedir("/test", recreate=True)
 
     def test_create_wipe_update_mtime(self):
