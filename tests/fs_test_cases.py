@@ -1726,6 +1726,9 @@ class FSTestCases(object):
             ["/bar/baz/test.txt", "/egg/bar/baz/test.txt"],
         )
 
+        # cleanup for following tests
+        self.fs.rm("/foo2", recursive=True)
+
     def _test_copy_dir_write(self, protocol):
         # Test copying to this filesystem from another.
         other_fs = fsspec.filesystem(protocol)
