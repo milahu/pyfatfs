@@ -171,21 +171,22 @@ class PyFatFS(AbstractFileSystem):
             raise e
         if not detail:
             return [str(e) for e in dirs+files]
-        # no. we already know entry types
+        # no. we already have all infos
         # return list(map(self.info, dirs+files))
         infos = []
-        for path in dirs:
+        for entry in dirs:
             infos.append({
-                "path": path,
+                "name": str(entry),
                 "type": "directory",
                 "size": 0,
             })
-        for path in files:
+        for entry in files:
             infos.append({
-                "path": path,
+                "name": str(entry),
                 "type": "file",
-                "size": self._getsize(path),
+                "size": entry.filesize,
             })
+        return infos
 
     def _create(self, path: str, wipe: bool = False) -> bool:
         """Create a new file.
