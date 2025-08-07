@@ -500,6 +500,8 @@ class PyFatFS(AbstractFileSystem):
         dir2 = split(path2)[0]
         if dir2:
             self.makedirs(dir2, exist_ok=True)
+        if self.isdir(path1):
+            return self.mkdir(path2)
         with (
             self.open(path1, "rb") as f1,
             self.open(path2, "wb") as f2
