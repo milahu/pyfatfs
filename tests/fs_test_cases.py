@@ -452,11 +452,11 @@ class FSTestCases(object):
         self.fs.writebytes("empty", b"")
         self.fs.writebytes("one", b"a")
         self.fs.writebytes("onethousand", ("b" * 1000).encode("ascii"))
-        self.assertEqual(self.fs.getsize("empty"), 0)
-        self.assertEqual(self.fs.getsize("one"), 1)
-        self.assertEqual(self.fs.getsize("onethousand"), 1000)
+        self.assertEqual(self.fs._getsize("empty"), 0)
+        self.assertEqual(self.fs._getsize("one"), 1)
+        self.assertEqual(self.fs._getsize("onethousand"), 1000)
         with self.assertRaises(FileNotFoundError):
-            self.fs.getsize("doesnotexist")
+            self.fs._getsize("doesnotexist")
 
     def test_invalid_chars(self):
         # Test invalid path method.
@@ -1313,19 +1313,19 @@ class FSTestCases(object):
         self.fs.create("foo")
         self.assertTrue(self.fs.exists("foo"))
         self.assertEqual(self.fs._gettype("foo"), "file")
-        self.assertEqual(self.fs.getsize("foo"), 0)
+        self.assertEqual(self.fs._getsize("foo"), 0)
 
         # Test wipe existing file
         self.fs.writebytes("foo", b"bar")
-        self.assertEqual(self.fs.getsize("foo"), 3)
+        self.assertEqual(self.fs._getsize("foo"), 3)
         self.fs.create("foo", wipe=True)
-        self.assertEqual(self.fs.getsize("foo"), 0)
+        self.assertEqual(self.fs._getsize("foo"), 0)
 
         # Test create with existing file, and not wipe
         self.fs.writebytes("foo", b"bar")
-        self.assertEqual(self.fs.getsize("foo"), 3)
+        self.assertEqual(self.fs._getsize("foo"), 3)
         self.fs.create("foo", wipe=False)
-        self.assertEqual(self.fs.getsize("foo"), 3)
+        self.assertEqual(self.fs._getsize("foo"), 3)
 
     def test_desc(self):
         # Describe a file
@@ -1598,7 +1598,7 @@ class FSTestCases(object):
         # Test truncate
         with self.fs.open("foo2", "r+b") as f:
             f.truncate(3)
-        self.assertEqual(self.fs.getsize("foo2"), 3)
+        self.assertEqual(self.fs._getsize("foo2"), 3)
         self.assert_bytes("foo2", b"hel")
 
     def test_files(self):
@@ -1638,7 +1638,7 @@ class FSTestCases(object):
         # Test truncate
         with self.fs.open("foo2", "r+") as f:
             f.truncate(3)
-        self.assertEqual(self.fs.getsize("foo2"), 3)
+        self.assertEqual(self.fs._getsize("foo2"), 3)
         self.assert_text("foo2", "hel")
 
         with self.fs.open("foo2", "ab") as f:
