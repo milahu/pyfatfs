@@ -16,12 +16,15 @@ import time
 import shutil
 import unittest
 import warnings
+import tempfile
 from datetime import datetime
 from six import text_type
 
 from pyfatfs.path import split, normpath
 
 import fsspec
+import fsspec.implementations.dirfs
+import fsspec.implementations.local
 
 if six.PY2:
     import collections as collections_abc
@@ -99,12 +102,37 @@ def walk_dirs(fs, path="/"):
         for _dir in dirs:
             yield normpath(subpath + "/" + _dir)
 
-def clean_memory_filesystem(fs):
-    if fs.protocol == "memory":
+class TempdirFileSystem(fsspec.implementations.dirfs.DirFileSystem):
+    def __init__(self):
+        self.tempdir = tempfile.mkdtemp(prefix="pyfatfs-test-")
+        self.local_fs = fsspec.implementations.local.LocalFileSystem(
+            use_listings_cache=False,
+        )
+        super().__init__(path=self.tempdir, fs=self.local_fs)
+    # FIXME TypeError: 'TempdirFileSystem' object does not support the context manager protocol
+    # def __enter__(self):
+    #     # FIXME AttributeError: 'super' object has no attribute '__enter__'
+    #     super().__enter__
+    # def __exit__(self):
+    #     shutil.rmtree(self.tempdir)
+    #     super().__exit__()
+    def __del__(self):
+        shutil.rmtree(self.tempdir)
+
+# # test
+# with TempdirFileSystem() as d:
+#     pass
+
+def get_filesystem(protocol):
+    if protocol == "tempdir":
+        return TempdirFileSystem()
+    fs = fsspec.filesystem(protocol)
+    if protocol == "memory":
         # the memory filesystem is global
         # so we have to remove previous files
         # https://github.com/fsspec/filesystem_spec/issues/1904
         fs.rm("/", recursive=True)
+    return fs
 
 UNICODE_TEXT = """
 
@@ -1251,7 +1279,7 @@ class FSTestCases(object):
 
     def _test_upload(self, workers):
         """Test copy_fs with varying number of worker threads."""
-        with fsspec.filesystem("tempdir") as src_fs:
+        with get_filesystem("tempdir") as src_fs:
             src_fs.write_bytes("foo", self.data1)
             src_fs.write_bytes("bar", self.data2)
             src_fs.makedir("dir1").write_bytes("baz", self.data3)
@@ -1278,7 +1306,7 @@ class FSTestCases(object):
     def _test_download(self, workers):
         """Test copy_fs with varying number of worker threads."""
         src_fs = self.fs
-        with fsspec.filesystem("tempdir") as dst_fs:
+        with get_filesystem("tempdir") as dst_fs:
             src_fs.write_bytes("foo", self.data1)
             src_fs.write_bytes("bar", self.data2)
             src_fs.makedir("dir1").write_bytes("baz", self.data3)
@@ -1707,8 +1735,7 @@ class FSTestCases(object):
         self.assert_text("/foo2/bar/baz/test.txt", "Goodbye, World")
 
         # Test copying a sub dir
-        other_fs = fsspec.filesystem(protocol)
-        clean_memory_filesystem(other_fs)
+        other_fs = get_filesystem(protocol)
         copy_dir(self.fs, "/foo", other_fs, "/")
         self.assertEqual(list(walk_files(other_fs)), ["/bar/baz/test.txt"])
 
@@ -1731,8 +1758,7 @@ class FSTestCases(object):
 
     def _test_copy_dir_write(self, protocol):
         # Test copying to this filesystem from another.
-        other_fs = fsspec.filesystem(protocol)
-        clean_memory_filesystem(other_fs)
+        other_fs = get_filesystem(protocol)
         self.assertEqual(other_fs.ls("/", detail=False), []) # other_fs should be empty
         other_fs.makedirs("foo/bar/baz")
         other_fs.makedir("egg")
@@ -1774,8 +1800,7 @@ class FSTestCases(object):
 
     def _test_move_dir_write(self, protocol):
         # Test moving to this filesystem from another.
-        other_fs = fsspec.filesystem(protocol)
-        clean_memory_filesystem(other_fs)
+        other_fs = get_filesystem(protocol)
         other_fs.makedirs("foo/bar/baz")
         other_fs.makedir("egg")
         other_fs.write_text("top.txt", "Hello, World")
@@ -1808,8 +1833,7 @@ class FSTestCases(object):
         self.assertEqual(next(self.fs.scandir("foo")).name, "test2.txt")
 
     def _test_move_file(self, protocol):
-        other_fs = fsspec.filesystem(protocol)
-        clean_memory_filesystem(other_fs)
+        other_fs = get_filesystem(protocol)
 
         text = "Hello, World"
         self.fs.makedir("foo").write_text("test.txt", text)
