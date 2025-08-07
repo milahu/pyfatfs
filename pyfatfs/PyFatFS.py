@@ -16,7 +16,6 @@ from pyfatfs.info import Info
 from pyfatfs.errors import DirectoryExpected, DirectoryExists, \
     ResourceNotFound, FileExpected, DirectoryNotEmpty, RemoveRootError, \
     FileExists
-from fsspec import ResourceType
 from fsspec.subfs import SubFS
 
 from pyfatfs import FAT_OEM_ENCODING
@@ -132,7 +131,7 @@ class PyFatFS(AbstractFileSystem):
                 "unicode_paths": self.fs.encoding.lower().startswith('utf'),
                 "supports_rename": True}
 
-    def getsize(self, path: str):
+    def _getsize(self, path: str):
         """Get size of file in bytes.
 
         :param path: Path to file or directory on filesystem
@@ -146,17 +145,24 @@ class PyFatFS(AbstractFileSystem):
             raise e
         return entry.filesize
 
-    def gettype(self, path: str):
-        """Get type of file as `ResourceType`.
+    def info(self, path, **kwargs):
+        _type = self._gettype(path)
+        if _type[0] == "d":
+            # dont call self._getsize
+            return {"name": path, "size": 0, "type": _type}
+        return {"name": path, "size": self._getsize(path), "type": _type}
+
+    def _gettype(self, path: str) -> str:
+        """Get type of file as `str`.
 
         :param path: Path to file or directory on filesystem
-        :returns: `ResourceType.directory` or `ResourceType.file`
+        :returns: `"directory"` or `"file"`
         """
         entry = self.fs.root_dir.get_entry(path)
         if entry.is_directory():
-            return ResourceType.directory
+            return "directory"
 
-        return ResourceType.file
+        return "file"
 
     def listdir(self, path: str):
         """List contents of given directory entry.
