@@ -555,12 +555,12 @@ class FSTestCases(object):
     def test_listdir(self):
         # Check listing directory that doesn't exist
         with self.assertRaises(FileNotFoundError):
-            self.fs.listdir("foobar")
+            self.fs.listdir("foobar", detail=False)
 
         # Check aliases for root
-        self.assertEqual(self.fs.listdir("/"), [])
-        self.assertEqual(self.fs.listdir("."), [])
-        self.assertEqual(self.fs.listdir("./"), [])
+        self.assertEqual(self.fs.listdir("/", detail=False), [])
+        self.assertEqual(self.fs.listdir(".", detail=False), [])
+        self.assertEqual(self.fs.listdir("./", detail=False), [])
 
         # Make a few objects
         self.fs.write_bytes("foo", b"egg")
@@ -571,33 +571,33 @@ class FSTestCases(object):
         self.fs.write_bytes("baz/egg", b"egg")
 
         # Check list works
-        six.assertCountEqual(self, self.fs.listdir("/"), ["foo", "bar", "baz"])
-        six.assertCountEqual(self, self.fs.listdir("."), ["foo", "bar", "baz"])
-        six.assertCountEqual(self, self.fs.listdir("./"), ["foo", "bar", "baz"])
+        six.assertCountEqual(self, self.fs.listdir("/", detail=False), ["foo", "bar", "baz"])
+        six.assertCountEqual(self, self.fs.listdir(".", detail=False), ["foo", "bar", "baz"])
+        six.assertCountEqual(self, self.fs.listdir("./", detail=False), ["foo", "bar", "baz"])
 
         # Check paths are unicode strings
-        for name in self.fs.listdir("/"):
+        for name in self.fs.listdir("/", detail=False):
             self.assertIsInstance(name, text_type)
 
         # Create a subdirectory
         self.fs.makedir("dir")
 
         # Should start empty
-        self.assertEqual(self.fs.listdir("/dir"), [])
+        self.assertEqual(self.fs.listdir("/dir", detail=False), [])
 
         # Write some files
         self.fs.write_bytes("dir/foofoo", b"egg")
         self.fs.write_bytes("dir/barbar", b"egg")
 
         # Check listing subdirectory
-        six.assertCountEqual(self, self.fs.listdir("dir"), ["foofoo", "barbar"])
+        six.assertCountEqual(self, self.fs.listdir("dir", detail=False), ["foofoo", "barbar"])
         # Make sure they are unicode stringd
-        for name in self.fs.listdir("dir"):
+        for name in self.fs.listdir("dir", detail=False):
             self.assertIsInstance(name, text_type)
 
         self.fs._create("notadir")
         with self.assertRaises(NotADirectoryError):
-            self.fs.listdir("notadir")
+            self.fs.listdir("notadir", detail=False)
 
     def test_move(self):
         # Make a file

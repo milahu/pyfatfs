@@ -136,7 +136,7 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
         self.assertEqual(fs.ls("/", detail=False), ["root"])
         assert fs.listdir("/root", detail=False).sort() == expected_dentries_root.sort()
         for i in range(0, 10):
-            self.assertEqual(fs.listdir(f"/root/{i}DIR").sort(),
+            self.assertEqual(fs.listdir(f"/root/{i}DIR", detail=False).sort(),
                              expected_dentries_sub.sort())
 
     def test_lazy_load_dentry_parent_update(self):
@@ -172,14 +172,14 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
         fs, in_memory_fs = _make_fs(self.FAT_TYPE, lazy_load=True)
         fs.makedirs("/foo")
         fs.touch("/foo/bar")
-        assert fs.listdir("/foo") == ['bar']
+        assert fs.listdir("/foo", detail=False) == ['bar']
 
         in_memory_fs.seek(0)
         fs = PyFatBytesIOFS(BytesIO(in_memory_fs.read()),
                             encoding='UTF-8', lazy_load=True)
         fs.touch("/foo/baz")
         fs.remove("/foo/bar")
-        assert fs.listdir("/foo") == ['baz']
+        assert fs.listdir("/foo", detail=False) == ['baz']
 
     def test_lazy_vs_nonlazy_tree(self):
         """Compare directory tree between lazy and non-lazy loading."""

@@ -164,9 +164,10 @@ class PyFatFS(AbstractFileSystem):
         dir_entry = self._get_dir_entry(path)
         try:
             dirs, files, _ = dir_entry.get_entries()
-        except OSError as e:
+        except (OSError, PyFATException) as e:
+            # PyFATException: Cannot get entries of this entry, as it is not a directory.
             if e.errno == errno.ENOTDIR:
-                raise DirectoryExpected(path)
+                raise NotADirectoryError(path)
             raise e
         if not detail:
             return [str(e) for e in dirs+files]
