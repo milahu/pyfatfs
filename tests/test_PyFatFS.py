@@ -87,7 +87,8 @@ class TestPyFatFS16(FSTestCases, TestCase, PyFsCompatLayer):
         self.fs.touch("/APPEND.TXT")
 
         def append_to_file(_fs, _i):
-            _fs.appendtext("/APPEND.TXT", str(_i) * 10 + "\n")
+            with _fs.open("/APPEND.TXT", "a") as f:
+                f.write(str(_i) * 10 + "\n")
 
         for i in range(0, 10):
             t = Thread(target=append_to_file, args=(self.fs, i))
