@@ -8,7 +8,7 @@ from copy import copy
 from io import BytesIO, IOBase
 from typing import Union
 
-from fsspec.base import FS
+from fsspec import AbstractFileSystem
 from fsspec.mode import Mode
 from fsspec.path import split, normpath
 from fsspec.permissions import Permissions
@@ -28,7 +28,7 @@ from pyfatfs.FatIO import FatIO
 from pyfatfs.EightDotThree import EightDotThree
 
 
-class PyFatFS(FS):
+class PyFatFS(AbstractFileSystem):
     """PyFilesystem2 extension."""
 
     def __init__(self, filename: str, encoding: str = FAT_OEM_ENCODING,
